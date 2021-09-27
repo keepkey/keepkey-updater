@@ -1,0 +1,67 @@
+{
+  "name": "kk-updater",
+  "version": "2.0.0",
+  "private": true,
+  "main": "public/electron.js",
+  "author": "keepkey",
+  "homepage": "./",
+  "dependencies": {
+    "@shapeshiftoss/hdwallet-keepkey-nodehid": "^0.11.0",
+    "@shapeshiftoss/hdwallet-keepkey-nodewebusb": "^1.16.3",
+    "electron-is-dev": "^0.3.0",
+    "electron-notarize": "^1.0.0",
+    "react": "^16.5.1",
+    "react-dom": "^16.5.1",
+    "react-scripts": "1.1.5",
+    "request": "^2.88.0",
+    "semantic-ui-react": "^0.84.0",
+    "serialport": "^7.0.2",
+    "usb-detection": "^4.10.0",
+    "webusb": "^2.2.0"
+  },
+  "build": {
+    "appId": "KeepKeyUpdater",
+    "productName": "KeepKey Updater",
+    "files": [
+      "build/**/*",
+      "build/icon.*",
+      "node_modules/**/*"
+    ],
+    "directories": {
+      "buildResources": "assets"
+    },
+    "mac": {
+      "icon": "build/icon.png",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "assets/build/entitlements.mac.plist",
+      "entitlementsInherit": "assets/build/entitlements.mac.plist"
+    },
+    "win": {
+      "icon": "build/icon.png"
+    },
+    "afterSign": "scripts/afterSignHook.js"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject",
+    "start-prod": "NODE_ENV=production electron ./build/electron.js",
+    "electron-dev": "concurrently \"BROWSER=none yarn start\" \"wait-on http://localhost:3000 && electron .\"",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "electron-pack": "build --c.extraMetadata.main=build/electron.js",
+    "notarize": "scripts/notarize.js",
+    "preelectron-pack": "yarn build",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "devDependencies": {
+    "concurrently": "^4.0.1",
+    "electron": "^2.0.9",
+    "electron-builder": "^20.42.0",
+    "electron-packager": "^12.1.2",
+    "electron-rebuild": "^1.8.2",
+    "wait-on": "^3.0.1"
+  }
+}

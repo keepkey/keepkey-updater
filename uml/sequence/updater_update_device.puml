@@ -1,0 +1,76 @@
+@startuml
+autonumber
+title User Updates KeepKey with Updater
+entity User
+entity KeepKeyUpdater
+entity KeepKey
+entity static.shapeshift.com
+
+activate User
+User -> KeepKeyUpdater: Starts Application
+activate KeepKeyUpdater
+KeepKeyUpdater -> static.shapeshift.com: GET `/firmware/releases.json`
+activate static.shapeshift.com
+static.shapeshift.com -> KeepKeyUpdater: return response
+KeepKeyUpdater -> KeepKeyUpdater: Check For Connected KeepKey
+
+alt No KeepKey Detected
+    KeepKeyUpdater -> User: Prompt User to Connect KeepKey
+    User -> KeepKey: Connect KeepKey
+end
+
+activate KeepKey
+KeepKey -> KeepKeyUpdater: send features
+KeepKeyUpdater -> KeepKeyUpdater: check features against data from releases.json
+
+alt Update Required
+    KeepKeyUpdater -> User: Inform User they need to update
+    User -> KeepKeyUpdater: Click Update
+    KeepKeyUpdater -> User: Ask for confirmation User has backup sentence
+    User -> KeepKeyUpdater: Confirm User has backup sentence
+    KeepKeyUpdater -> User: Instruct User to restart KeepKey in Update Mode
+    deactivate KeepKey
+    User -> KeepKey: restart KeepKey in bootloader mode
+    activate KeepKey
+    KeepKey -> KeepKeyUpdater: send features
+
+    alt Bootloader Update Required
+        KeepKeyUpdater -> static.shapeshift.com: create stream from bootloader url 
+        static.shapeshift.com -> KeepKeyUpdater: return response
+        KeepKeyUpdater -> KeepKey: uploadFirmware(blupdaterStream)
+        KeepKey -> User: ask for backup sentence confirmation
+        User -> KeepKey: hold down button
+        KeepKey -> KeepKeyUpdater: return success
+        KeepKeyUpdater -> User: Instruct user to restart KeepKey, allow the blupdater to run, and then restart in bootloader mode
+        deactivate KeepKey
+        User -> KeepKey: reconnect KeepKey
+        activate KeepKey
+        KeepKey -> KeepKey: run the blupdater
+        KeepKey -> User: display the blupdater has successfully run and ask for restart in bootloader mode
+        deactivate KeepKey
+        User -> KeepKey: restart KeepKey in bootloader mode
+        activate KeepKey
+        KeepKey -> KeepKeyUpdater: send features
+    end
+
+    KeepKeyUpdater -> static.shapeshift.com: create stream from firmware url 
+    static.shapeshift.com -> KeepKeyUpdater: return response
+    deactivate static.shapeshift.com
+    KeepKeyUpdater -> KeepKey: uploadFirmware(firmwareStream)
+    KeepKey -> User: ask for backup sentence confirmation
+    User -> KeepKey: hold down button
+    KeepKey -> KeepKeyUpdater: return success
+    KeepKeyUpdater -> User: display success and ask user to reconnect KeepKey
+    deactivate KeepKey
+    User -> KeepKey: restart KeepKey
+    activate KeepKey
+    KeepKey -> KeepKeyUpdater: send features
+    KeepKeyUpdater -> User: display update complete
+    User -> KeepKeyUpdater: click 'Finish Update'
+end
+
+KeepKeyUpdater -> User: display bootloader and firmware are up to date and show link to go to ShapeShift
+deactivate KeepKeyUpdater
+deactivate User
+deactivate KeepKey
+@enduml
