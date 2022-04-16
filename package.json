@@ -1,21 +1,22 @@
 {
   "name": "kk-updater",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "private": true,
   "main": "public/electron.js",
   "author": "keepkey",
   "homepage": "./",
   "dependencies": {
-    "@shapeshiftoss/hdwallet-keepkey-nodehid": "^0.11.0",
-    "@shapeshiftoss/hdwallet-keepkey-nodewebusb": "^1.16.3",
+    "@shapeshiftoss/hdwallet-core": "1.19.1",
+    "@shapeshiftoss/hdwallet-keepkey-nodehid": "1.19.1",
+    "@shapeshiftoss/hdwallet-keepkey-nodewebusb": "1.19.1",
     "electron-is-dev": "^0.3.0",
     "electron-notarize": "^1.0.0",
+    "node-hid": "^0.7.9",
     "react": "^16.5.1",
     "react-dom": "^16.5.1",
     "react-scripts": "1.1.5",
     "request": "^2.88.0",
     "semantic-ui-react": "^0.84.0",
-    "serialport": "^7.0.2",
     "usb-detection": "^4.10.0",
     "webusb": "^2.2.0"
   },
@@ -39,8 +40,7 @@
     },
     "win": {
       "icon": "build/icon.png"
-    },
-    "afterSign": "scripts/afterSignHook.js"
+    }
   },
   "scripts": {
     "start": "react-scripts start",
