@@ -17,6 +17,7 @@
     "react-dom": "^16.8.6",
     "react-scripts": "1.1.5",
     "semantic-ui-react": "^0.84.0",
+    "semver-compare": "^1.0.0",
     "usb-detection": "~4.13.0",
     "webusb": "^2.2.0"
   },

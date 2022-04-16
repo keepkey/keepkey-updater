@@ -1,10 +1,21 @@
 import React, { Fragment } from 'react';
 import Updatable from './Updatable';
 import { Button } from 'semantic-ui-react'
+import semverCmp from 'semver-compare'
 
 const { shell, ipcRenderer } = window.require('electron');
 
 const stripV = (version) => version.replace(/v/g, '')
+
+const versionIsUpToDate = (current, target) => {
+  current = current.replace(/^v/, "");
+  target = target.replace(/^v/, "");
+  try {
+    return semverCmp(current, target) !== -1;
+  } catch (e) {
+    return false;
+  }
+};
 
 export default ({ features, initiateUpdate, latest, connecting, updateTitleBar })  => {
   const { firmwareVersion, bootloaderVersion } = features;
@@ -13,8 +24,8 @@ export default ({ features, initiateUpdate, latest, connecting, updateTitleBar }
     latestFirmwareVersion = latest.firmware.version;
     latestBootloaderVersion = latest.bootloader.version;
   }
-  const firmwareCurrent = firmwareVersion === latestFirmwareVersion;
-  const bootloaderCurrent = bootloaderVersion === latestBootloaderVersion;
+  const firmwareCurrent = versionIsUpToDate(firmwareVersion, latestFirmwareVersion);
+  const bootloaderCurrent = versionIsUpToDate(bootloaderVersion, latestBootloaderVersion);
   const updateRequired = !(bootloaderCurrent && firmwareCurrent);
 
   if(updateRequired && !connecting) {
