@@ -11,7 +11,7 @@ export default class FirmwareUpdating extends Component {
 
   openHelpArticle(e) {
     e.preventDefault()
-    const url = 'https://beta.shapeshift.com'
+    const url = 'https://app.shapeshift.com'
     shell.openExternal(url)
   }
 

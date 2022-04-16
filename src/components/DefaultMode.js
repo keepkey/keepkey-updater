@@ -38,7 +38,7 @@ export default ({ features, initiateUpdate, latest, connecting, updateTitleBar }
 
   const goToShapeshift = (e) => {
     e.preventDefault();
-    const url = 'https://beta.shapeshift.com';
+    const url = 'https://app.shapeshift.com';
     shell.openExternal(url);
     ipcRenderer.send('close-application')
   }
