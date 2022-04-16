@@ -52,12 +52,13 @@ const sleep = (millis) => (new Promise((resolve, reject) => {
 
 const normalizeWebUsbFeatures = async (features) => {
   if (!features) return null
-  const { majorVersion, minorVersion, patchVersion, bootloaderHash } = features
-  const decodedHash = base64toHEX(bootloaderHash)
+  const { bootloaderHash, firmwareHash } = features
+  const decodedBootloaderHash = base64toHEX(bootloaderHash)
+  const decodedFirmwareHash = base64toHEX(firmwareHash)
   return {
     ...features,
-    firmwareVersion: `v${majorVersion}.${minorVersion}.${patchVersion}`,
-    bootloaderVersion: (await getFirmwareData())?.hashes?.bootloader?.[decodedHash] ?? "Unknown"
+    firmwareVersion: (await getFirmwareData())?.hashes?.firmware?.[decodedFirmwareHash] ?? "Unknown",
+    bootloaderVersion: (await getFirmwareData())?.hashes?.bootloader?.[decodedBootloaderHash] ?? "Unknown"
   }
 }
 
@@ -326,6 +327,7 @@ async function createWindow() {
     height: 525,
     title: '',
     resizable: isDev,
+    autoHideMenuBar: true,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
@@ -333,6 +335,7 @@ async function createWindow() {
       webSecurity: true,
     },
   });
+  if (!isDev) mainWindow.removeMenu();
   mainWindow.loadURL(isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, '../build/index.html')}`);
   mainWindow.on('closed', () => mainWindow = null);
 }
