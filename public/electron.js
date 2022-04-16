@@ -2,7 +2,6 @@ const electron = require('electron');
 const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
 const path = require('path');
-const url = require('url');
 const isDev = require('electron-is-dev');
 const usbDetect = require('usb-detection');
 const { NodeWebUSBKeepKeyAdapter } = require('@shapeshiftoss/hdwallet-keepkey-nodewebusb')
@@ -10,7 +9,10 @@ const { HIDKeepKeyAdapter } = require('@shapeshiftoss/hdwallet-keepkey-nodehid')
 const { Keyring } = require('@shapeshiftoss/hdwallet-core')
 const request = require('request')
 
-const FIRMWARE_BASE_URL = "https://static.shapeshift.com/firmware/"
+const FIRMWARE_MANIFEST_URL = (() => {
+  if (process.argv[1] === "--manifest") return new URL(process.argv[2]).toString();
+  return "https://static.shapeshift.com/firmware/releases.json";
+})()
 
 let mainWindow;
 
@@ -21,25 +23,6 @@ usbDetect.startMonitoring();
 
 const keyring = new Keyring
 let webUsbAdapter, hidAdapter
-
-const bootloaderHashToVersion = {
-  '6397c446f6b9002a8b150bf4b9b4e0bb66800ed099b881ca49700139b0559f10': 'v1.0.0',
-  'f13ce228c0bb2bdbc56bdcb5f4569367f8e3011074ccc63331348deb498f2d8f': 'v1.0.0',
-  'd544b5e06b0c355d68b868ac7580e9bab2d224a1e2440881cc1bca2b816752d5': 'v1.0.1',
-  'ec618836f86423dbd3114c37d6e3e4ffdfb87d9e4c6199cf3e163a67b27498a2': 'v1.0.1',
-  'cd702b91028a2cfa55af43d3407ba0f6f752a4a2be0583a172983b303ab1032e': 'v1.0.2',
-  'bcafb38cd0fbd6e2bdbea89fb90235559fdda360765b74e4a8758b4eff2d4921': 'v1.0.2',
-  'cb222548a39ff6cbe2ae2f02c8d431c9ae0df850f814444911f521b95ab02f4c': 'v1.0.3',
-  '917d1952260c9b89f3a96bea07eea4074afdcc0e8cdd5d064e36868bdd68ba7d': 'v1.0.3',
-  '6465bc505586700a8111c4bf7db6f40af73e720f9e488d20db56135e5a690c4f': 'v1.0.3',
-  'db4bc389335e876e942ae3b12558cecd202b745903e79b34dd2c32532708860e': 'v1.0.3',
-  '2e38950143cf350345a6ddada4c0c4f21eb2ed337309f39c5dbc70b6c091ae00': 'v1.0.3',
-  '83d14cb6c7c48af2a83bc326353ee6b9abdd74cfe47ba567de1cb564da65e8e9': 'v1.0.3',
-  '770b30aaa0be884ee8621859f5d055437f894a5c9c7ca22635e7024e059857b7': 'v1.0.4',
-  'fc4e5c4dc2e5127b6814a3f69424c936f1dc241d1daf2c5a2d8f0728eb69d20d': 'v1.0.4',
-  'e45f587fb07533d832548402d0e71d8e8234881da54d86c4b699c28a6482b0ee': 'v1.1.0',
-  '9bf1580d1b21250f922b68794cdadd6c8e166ae5b15ce160a42f8c44a2f05936': 'v2.0.0',
-}
 
 const atob = str => Buffer.from(str, 'base64').toString('binary');
 
@@ -60,24 +43,24 @@ const sleep = (millis) => (new Promise((resolve, reject) => {
   setTimeout(resolve, millis)
 }))
 
-const normalizeWebUsbFeatures = (features) => {
+const normalizeWebUsbFeatures = async (features) => {
   if (!features) return null
   const { majorVersion, minorVersion, patchVersion, bootloaderHash } = features
   const decodedHash = base64toHEX(bootloaderHash)
   return {
     ...features,
     firmwareVersion: `v${majorVersion}.${minorVersion}.${patchVersion}`,
-    bootloaderVersion: bootloaderHashToVersion[decodedHash]
+    bootloaderVersion: (await getFirmwareData()).hashes.bootloader[decodedHash]
   }
 }
 
-const normalizeHidFeatures = (features) => {
+const normalizeHidFeatures = async (features) => {
   if (!features) return null
   const { bootloaderHash, bootloaderMode } = features
   const decodedHash = base64toHEX(bootloaderHash)
   const normedFeatures = {
     ...features,
-    bootloaderVersion: bootloaderHashToVersion[decodedHash]
+    bootloaderVersion: (await getFirmwareData()).hashes.bootloader[decodedHash]
   }
   if (!bootloaderMode) {
     const { majorVersion, minorVersion, patchVersion, bootloaderHash } = features
@@ -146,20 +129,22 @@ const wipeDevice = async () => {
 // =======================================================================================
 // talking to S3 Bucket
 
-let latestFirmwareData, firmwareBinary, blupdaterBinary
+let firmwareDataPromise, firmwareBinary, blupdaterBinary
 
-const getLatestFirmwareData = async () => {
-  return new Promise((resolve, reject) => {
-    request(`${FIRMWARE_BASE_URL}releases.json`, (err, response, body) => {
-      if(err) return reject(err)
-      resolve(JSON.parse(body).latest)
+const getFirmwareData = async () => {
+  if (!firmwareDataPromise) {
+    firmwareDataPromise = new Promise((resolve, reject) => {
+      request(FIRMWARE_MANIFEST_URL, (err, response, body) => {
+        if(err) return reject(err)
+        resolve(JSON.parse(body))
+      })
     })
-  })
+  }
+  return await firmwareDataPromise
 }
 
 const setTempFirmware = async () => {
-  if(!latestFirmwareData) return
-  const path = latestFirmwareData.firmware.url
+  const path = (await getFirmwareData()).latest.firmware.url
   try {
     firmwareBinary = await getBinary(path)
   } catch (err) {
@@ -169,8 +154,7 @@ const setTempFirmware = async () => {
 }
 
 const setTempBlupdater = async () => {
-  if(!latestFirmwareData) return
-  const path = latestFirmwareData.bootloader.url
+  const path = (await getFirmwareData()).latest.bootloader.url
   try {
     blupdaterBinary = await getBinary(path)
   } catch (err) {
@@ -182,7 +166,7 @@ const setTempBlupdater = async () => {
 const getBinary = async (path) => {
   return new Promise((resolve, reject) => {
     request({
-      url: FIRMWARE_BASE_URL + path,
+      url: new URL(path, new URL(FIRMWARE_MANIFEST_URL)).toString(),
       headers: {
         accept: 'application/octet-stream',
       },
@@ -207,7 +191,7 @@ usbDetect.on('add:11044:1', async function(device) {
   mainWindow.webContents.send('connecting', true)
   const wallet = await createHidWallet()
   const features = wallet ? wallet.features : null
-  mainWindow.webContents.send('features', normalizeHidFeatures(features))
+  mainWindow.webContents.send('features', await normalizeHidFeatures(features))
   mainWindow.webContents.send('connecting', false)
 });
 
@@ -222,7 +206,7 @@ usbDetect.on('add:11044:2', async function(device) {
   const wallet = await createWebUsbWallet()
   mainWindow.webContents.send('connecting', false)
   const features = wallet ? wallet.features : null
-  mainWindow.webContents.send('features', normalizeWebUsbFeatures(features))
+  mainWindow.webContents.send('features', await normalizeWebUsbFeatures(features))
 });
 
 usbDetect.on('remove:11044:2', async function(device) {
@@ -239,19 +223,18 @@ usbDetect.on('remove:11044:2', async function(device) {
 
 electron.ipcMain.on('app-start', async (event, arg) => {
   try {
-    latestFirmwareData = await getLatestFirmwareData();
-    mainWindow.webContents.send('latest', latestFirmwareData);
+    mainWindow.webContents.send('latest', (await getFirmwareData()).latest);
     let connectedDeviceProductId
     await usbDetect.find(0x2b24, function(err, foundDevices) { connectedDeviceProductId = foundDevices.length ? foundDevices[0].productId : null })
     let features, wallet
     switch (connectedDeviceProductId) {
       case 1:
         wallet = await createHidWallet()
-        features = wallet ? normalizeHidFeatures(wallet.features) : null
+        features = wallet ? await normalizeHidFeatures(wallet.features) : null
         break
       case 2:
         wallet = await createWebUsbWallet()
-        features = wallet ? normalizeWebUsbFeatures(wallet.features) : null
+        features = wallet ? await normalizeWebUsbFeatures(wallet.features) : null
         break
       default:
         features = null
