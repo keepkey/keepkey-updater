@@ -34,11 +34,11 @@ function renderWarning(props, state, setState, showCustom) {
 
 function renderOptions(props, state, setState, showCustom) {
   const { initiateUpdate, latest, features: { bootloaderVersion }} = props;
-  const version = latest && latest.bootloader && latest.bootloader.version;
+  const latestBootloaderVersion = latest && latest.bootloader && latest.bootloader.version;
   return(
     <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', justifyContent: 'space-around', height: 280 }}>
-      { version && <Button primary onClick={() => initiateUpdate('UPDATE_BOOTLOADER')}>Update Bootloader & Firmware</Button> }
-      { version === bootloaderVersion &&
+      { latestBootloaderVersion && <Button primary onClick={() => initiateUpdate('UPDATE_BOOTLOADER')}>Update Bootloader & Firmware</Button> }
+      { bootloaderVersion === latestBootloaderVersion &&
         <Button primary onClick={() => initiateUpdate('UPDATE_FIRMWARE')}>Update Firmware</Button> }
       { showCustom && <Button primary onClick={() => initiateUpdate('UPDATE_CUSTOM')}>Update From File</Button> }
         <p>
