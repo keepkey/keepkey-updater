@@ -52,31 +52,17 @@ const sleep = (millis) => (new Promise((resolve, reject) => {
   setTimeout(resolve, millis)
 }))
 
-const normalizeWebUsbFeatures = async (features) => {
+const normalizeFeatures = async (features) => {
   if (!features) return null
   const { bootloaderHash, firmwareHash } = features
-  const decodedBootloaderHash = base64toHEX(bootloaderHash)
-  const decodedFirmwareHash = base64toHEX(firmwareHash)
+  const decodedBootloaderHash = bootloaderHash && base64toHEX(bootloaderHash)
+  const decodedFirmwareHash = firmwareHash && base64toHEX(firmwareHash)
+  const hashes = (await getFirmwareData().catch(x => ({}))).hashes
   return {
     ...features,
-    firmwareVersion: (await getFirmwareData())?.hashes?.firmware?.[decodedFirmwareHash] ?? "Unknown",
-    bootloaderVersion: (await getFirmwareData())?.hashes?.bootloader?.[decodedBootloaderHash] ?? "Unknown"
+    firmwareVersion: hashes?.firmware?.[decodedFirmwareHash] ?? "Unknown",
+    bootloaderVersion: hashes?.bootloader?.[decodedBootloaderHash] ?? "Unknown"
   }
-}
-
-const normalizeHidFeatures = async (features) => {
-  if (!features) return null
-  const { bootloaderHash, bootloaderMode } = features
-  const decodedHash = base64toHEX(bootloaderHash)
-  const normedFeatures = {
-    ...features,
-    bootloaderVersion: (await getFirmwareData())?.hashes?.bootloader?.[decodedHash] ?? "Unknown"
-  }
-  if (!bootloaderMode) {
-    const { majorVersion, minorVersion, patchVersion, bootloaderHash } = features
-    normedFeatures.firmwareVersion = `v${majorVersion}.${minorVersion}.${patchVersion}`
-  }
-  return normedFeatures
 }
 
 const createWebUsbWallet = async (attempts = 0) => {
@@ -195,7 +181,7 @@ usbDetect.on('add:11044:1', async function(device) {
   mainWindow.webContents.send('connecting', true)
   const wallet = await createHidWallet()
   const features = wallet ? wallet.features : null
-  mainWindow.webContents.send('features', await normalizeHidFeatures(features))
+  mainWindow.webContents.send('features', await normalizeFeatures(features))
   mainWindow.webContents.send('connecting', false)
 });
 
@@ -210,7 +196,7 @@ usbDetect.on('add:11044:2', async function(device) {
   const wallet = await createWebUsbWallet()
   mainWindow.webContents.send('connecting', false)
   const features = wallet ? wallet.features : null
-  mainWindow.webContents.send('features', await normalizeWebUsbFeatures(features))
+  mainWindow.webContents.send('features', await normalizeFeatures(features))
 });
 
 usbDetect.on('remove:11044:2', async function(device) {
@@ -233,11 +219,11 @@ electron.ipcMain.on('app-start', async (event, arg) => {
     switch (connectedDeviceProductId) {
       case 1:
         wallet = await createHidWallet()
-        features = wallet ? await normalizeHidFeatures(wallet.features) : null
+        features = wallet ? await normalizeFeatures(wallet.features) : null
         break
       case 2:
         wallet = await createWebUsbWallet()
-        features = wallet ? await normalizeWebUsbFeatures(wallet.features) : null
+        features = wallet ? await normalizeFeatures(wallet.features) : null
         break
       default:
         features = null
