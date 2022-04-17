@@ -12,14 +12,17 @@ const { Keyring } = require('@shapeshiftoss/hdwallet-core')
 const url = require('url')
 const fetch = require('./node-fetch-file-url');
 
-const FIRMWARE_MANIFEST_URL = (() => {
-  if (process.argv[1] === "--manifest") {
-    try {
-      return new URL(process.argv[2]);
-    } catch {
-      return url.pathToFileURL(process.argv[2]);
-    }
+const normalizeManifestUrl = (x) => {
+  try {
+    return new URL(x);
+  } catch {
+    return url.pathToFileURL(x);
   }
+}
+
+const FIRMWARE_MANIFEST_URL = (() => {
+  if (process.argv[1] === "--manifest") return normalizeManifestUrl(process.argv[2]);
+  if (process.env.KEEPKEY_FIRMWARE_MANIFEST) return normalizeManifestUrl(process.env.KEEPKEY_FIRMWARE_MANIFEST);
   return new URL("https://static.shapeshift.com/firmware/releases.json");
 })()
 
