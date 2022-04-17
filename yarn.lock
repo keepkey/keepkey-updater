@@ -132,41 +132,41 @@
     varuint-bitcoin "^1.0.4"
     wif "^2.0.1"
 
-"@shapeshiftoss/hdwallet-core@1.19.2-alpha.0":
-  version "1.19.2-alpha.0"
-  resolved "https://registry.yarnpkg.com/@shapeshiftoss/hdwallet-core/-/hdwallet-core-1.19.2-alpha.0.tgz#df88793649daa05776a7514e95414475974e10f6"
-  integrity sha512-O3pHczE+YSK36FFqPGeyAq518tpeY7wQD5Lp7WB5Eo9kek8LMDDndXVS+ZFs1rcw+jejZUootyELIF+pnVQFgg==
+"@shapeshiftoss/hdwallet-core@1.19.2-alpha.1":
+  version "1.19.2-alpha.1"
+  resolved "https://registry.yarnpkg.com/@shapeshiftoss/hdwallet-core/-/hdwallet-core-1.19.2-alpha.1.tgz#554ebad7c1faf45cf164e9522d74775813333107"
+  integrity sha512-VQGr914ZJbWkozlqWt93XKNeZznerkIHudDvM3e6hKOXcRoUDwwW9+us94Usq/BMvlI/LZXoTLs6UY2eB2gszA==
   dependencies:
     eventemitter2 "^5.0.1"
     lodash "^4.17.21"
     rxjs "^6.4.0"
     type-assertions "^1.1.0"
 
-"@shapeshiftoss/hdwallet-keepkey-nodehid@1.19.2-alpha.0":
-  version "1.19.2-alpha.0"
-  resolved "https://registry.yarnpkg.com/@shapeshiftoss/hdwallet-keepkey-nodehid/-/hdwallet-keepkey-nodehid-1.19.2-alpha.0.tgz#d612b2e9d3ddadae04f80955e9cf2b50b0adede9"
-  integrity sha512-AzfllzeABvy/cG7yeO25Q3z4JFyJjNJ1fKmpzxztgEJKQQ4zjVCEfsHQvyY8m404hwNFJK1Bf2eAeFVq4yrX0w==
+"@shapeshiftoss/hdwallet-keepkey-nodehid@1.19.2-alpha.1":
+  version "1.19.2-alpha.1"
+  resolved "https://registry.yarnpkg.com/@shapeshiftoss/hdwallet-keepkey-nodehid/-/hdwallet-keepkey-nodehid-1.19.2-alpha.1.tgz#73c5ed2ac077fbd07733404d24547ed1189463ff"
+  integrity sha512-fZJjhPDs5dcTZUvzlwASVeaZUZD3EUrdldpotjBKujajPJt9MGhjQS1lBLrKeu125Q4dIecAnDkjz3aqfjtLMQ==
   dependencies:
-    "@shapeshiftoss/hdwallet-keepkey" "1.19.2-alpha.0"
+    "@shapeshiftoss/hdwallet-keepkey" "1.19.2-alpha.1"
 
-"@shapeshiftoss/hdwallet-keepkey-nodewebusb@1.19.2-alpha.0":
-  version "1.19.2-alpha.0"
-  resolved "https://registry.yarnpkg.com/@shapeshiftoss/hdwallet-keepkey-nodewebusb/-/hdwallet-keepkey-nodewebusb-1.19.2-alpha.0.tgz#560583c363101a2855c0a439a629ca6ed9a9fd17"
-  integrity sha512-3YgURCMBeQd2CP4gWiW+fPP5ItyZin90+tR1kSqjdT3Ph6deI2K7Dshe9sLbDWvVcog3+vfaUr+XnJrn2IfO6A==
+"@shapeshiftoss/hdwallet-keepkey-nodewebusb@1.19.2-alpha.1":
+  version "1.19.2-alpha.1"
+  resolved "https://registry.yarnpkg.com/@shapeshiftoss/hdwallet-keepkey-nodewebusb/-/hdwallet-keepkey-nodewebusb-1.19.2-alpha.1.tgz#3b28488604e24a0ff754d2296ab5a083e8a38ed6"
+  integrity sha512-n6VurJgf7zDKheXSqBn+j4KkoVl4OH0RhmypFrqSMAYmAPHO0/gmDPihdj0CAdzSKjQs/ZgHg7bH77U7YBmJDQ==
   dependencies:
-    "@shapeshiftoss/hdwallet-core" "1.19.2-alpha.0"
-    "@shapeshiftoss/hdwallet-keepkey" "1.19.2-alpha.0"
+    "@shapeshiftoss/hdwallet-core" "1.19.2-alpha.1"
+    "@shapeshiftoss/hdwallet-keepkey" "1.19.2-alpha.1"
 
-"@shapeshiftoss/hdwallet-keepkey@1.19.2-alpha.0":
-  version "1.19.2-alpha.0"
-  resolved "https://registry.yarnpkg.com/@shapeshiftoss/hdwallet-keepkey/-/hdwallet-keepkey-1.19.2-alpha.0.tgz#5eb1cb5974e82eec7935e96816580189d2d1f069"
-  integrity sha512-cOItwHMXlnSGcByGB/rWzSNmYmY0J/AV1bZiG1yNmQxS1pKcT2lqaZy+wvwBjrHuHOG2V7YCi8k1ZBKNvRy4fQ==
+"@shapeshiftoss/hdwallet-keepkey@1.19.2-alpha.1":
+  version "1.19.2-alpha.1"
+  resolved "https://registry.yarnpkg.com/@shapeshiftoss/hdwallet-keepkey/-/hdwallet-keepkey-1.19.2-alpha.1.tgz#9f3ab3e0b03a3eec816af2f6671edd0d964087b2"
+  integrity sha512-kIl1C8n59WUb0Qk9FJasd00aOJ6yVJfYADawA3WfZlTO4u8U0Gwu91D6VV+JK1wAxlZPYlSkNX0vtlElQtdnAw==
   dependencies:
     "@ethereumjs/common" "^2.4.0"
     "@ethereumjs/tx" "^3.3.0"
     "@keepkey/device-protocol" "^7.8.1"
     "@shapeshiftoss/bitcoinjs-lib" "5.2.0-shapeshift.2"
-    "@shapeshiftoss/hdwallet-core" "1.19.2-alpha.0"
+    "@shapeshiftoss/hdwallet-core" "1.19.2-alpha.1"
     bignumber.js "^9.0.1"
     bnb-javascript-sdk-nobroadcast "^2.16.14"
     crypto-js "^4.0.0"

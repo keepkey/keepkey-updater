@@ -83,9 +83,7 @@ const createWebUsbWallet = async (attempts = 0) => {
 const createHidWallet = async (attempts = 0) => {
   try {
     hidAdapter = await HIDKeepKeyAdapter.useKeyring(keyring)
-    await hidAdapter.initialize()
-    const wallet = keyring.get()
-    if (!wallet) throw 'No wallet in the keyring'
+    const wallet = await hidAdapter.pairDevice()
     return wallet
   } catch (error) {
     if (attempts < 10) {
