@@ -103,8 +103,8 @@ const uploadToDevice = async (binary) => {
     if (!wallet) return null
     if (!firmwareIsValid(binary)) throw new Error("firmware binary not valid");
     await wallet.firmwareErase()
-    const uploadResult = await wallet.firmwareUpload(binary)
-    return uploadResult
+    await wallet.firmwareUpload(binary)
+    return true
   } catch (error) {
     console.log('error uploading to device: ', error)
     return false
