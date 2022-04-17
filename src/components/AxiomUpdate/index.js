@@ -48,6 +48,10 @@ export default class AxiomUpdate extends Component {
     ipcRenderer.send('update-firmware');
   }
 
+  updateCustom() {
+    ipcRenderer.send('update-custom');
+  }
+
   setDeviceIsInitialized(deviceIsInitialized) {
     this.setState({ deviceIsInitialized })
   }
@@ -89,6 +93,12 @@ export default class AxiomUpdate extends Component {
           deviceIsInitialized={deviceIsInitialized}
           updateTitleBar={updateTitleBar}
           updateFirmware={this.updateFirmware} />
+      case 'updatingCustom':
+        return <FirmwareUpdating
+          deviceIsInitialized={deviceIsInitialized}
+          updateTitleBar={updateTitleBar}
+          updateFirmware={this.updateCustom} />
+      case 'customUpdated':
       case 'firmwareUpdated':
         return <FirmwareUpdated { ...shared } />;
       case 'updateComplete':
@@ -114,6 +124,7 @@ const updateMachine = {
   initial: {
     UPDATE_BOOTLOADER: 'updatingBootloader',
     UPDATE_FIRMWARE: 'updatingFirmware',
+    UPDATE_CUSTOM: 'updatingCustom',
   },
   updatingBootloader: {
     BOOTLOADER_UPDATE_SUCCESS: 'bootloaderUpdated',
@@ -127,6 +138,13 @@ const updateMachine = {
     FAILED: 'failure',
   },
   firmwareUpdated: {
+    UPDATE_COMPLETE: 'updateComplete', // skip to complete as we are not updating policies
+  },
+  updatingCustom: {
+    CUSTOM_UPDATE_SUCCESS: 'customUpdated',
+    FAILED: 'failure',
+  },
+  customUpdated: {
     UPDATE_COMPLETE: 'updateComplete', // skip to complete as we are not updating policies
   },
   failure: {

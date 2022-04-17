@@ -1,5 +1,6 @@
 const electron = require('electron');
 const app = electron.app;
+const dialog = electron.dialog;
 const BrowserWindow = electron.BrowserWindow;
 const path = require('path');
 const isDev = require('electron-is-dev');
@@ -306,6 +307,27 @@ electron.ipcMain.on('update-bootloader', async (event, arg) => {
   }
 });
 
+electron.ipcMain.on('update-custom', async (event, arg) => {
+  try {
+    const { filePaths: customBinaryPaths } = await dialog.showOpenDialog({
+      filters: [{ name: "Firmware Images", extensions: ["bin"] }],
+      properties: ["openFile", "dontAddToRecent"],
+    });
+    const customBinaryPath = customBinaryPaths[0];
+    if (!customBinaryPath) throw new Error("no file selected");
+    const customBinary = Buffer.from(await (await fetch(url.pathToFileURL(customBinaryPath))).arrayBuffer());
+    if (!firmwareIsValid(customBinary)) throw new Error("the selected file is not a valid firmware image");
+    const updateResponse = await uploadToDevice(customBinary)
+    if (updateResponse) {
+      mainWindow.webContents.send('update-status', 'CUSTOM_UPDATE_SUCCESS');
+    } else {
+      mainWindow.webContents.send('update-status', 'FAILED');
+    }
+  } catch (err) {
+    console.error('failed to upload custom binary to device: ', err);
+    mainWindow.webContents.send('update-status', 'FAILED');
+  }
+});
 
 electron.ipcMain.on('close-application', async (event, arg) => {
   try {
@@ -352,6 +374,7 @@ app.on('before-quit', () => {
   ipcMain.removeAllListeners('app-start');
   ipcMain.removeAllListeners('update-firmware');
   ipcMain.removeAllListeners('update-bootloader');
+  ipcMain.removeAllListeners('update-custom');
   ipcMain.removeAllListeners('set-policy');
 });
 
