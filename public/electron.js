@@ -149,8 +149,8 @@ const getFirmwareData = async () => {
 }
 
 const setTempFirmware = async () => {
-  const path = (await getFirmwareData()).latest.firmware.url
   try {
+    const path = (await getFirmwareData()).latest.firmware.url
     firmwareBinary = await getBinary(path)
   } catch (err) {
     console.log({ err })
@@ -159,8 +159,8 @@ const setTempFirmware = async () => {
 }
 
 const setTempBlupdater = async () => {
-  const path = (await getFirmwareData()).latest.bootloader.url
   try {
+    const path = (await getFirmwareData()).latest.bootloader.url
     blupdaterBinary = await getBinary(path)
   } catch (err) {
     console.log({ err })
