@@ -328,6 +328,7 @@ async function createWindow() {
     title: '',
     resizable: isDev,
     autoHideMenuBar: true,
+    show: false,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
@@ -338,6 +339,7 @@ async function createWindow() {
   if (!isDev) mainWindow.removeMenu();
   const bundledIndexPath = `file://${path.join(__dirname, '../build/index.html')}`;
   mainWindow.on('closed', () => mainWindow = null);
+  mainWindow.on('ready-to-show', () => mainWindow.show());
   await mainWindow.loadURL(isDev ? 'http://localhost:3000' : bundledIndexPath).catch(() => mainWindow.loadURL(bundledIndexPath));
 }
 
