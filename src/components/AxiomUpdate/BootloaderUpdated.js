@@ -19,6 +19,10 @@ export default class BootloaderUpdated extends Component {
       && latest.bootloader.version === features.bootloaderVersion
     if(reconnectInBootloaderMode && !this.state.readyForFirmwareUpdate) {
       this.setState({ readyForFirmwareUpdate: true })
+      this.props.updateTitleBar({ title: 'Bootloader Updated', progress: 100 })
+    }
+    if (this.state.readyForFirmwareUpdate) {
+      this.props.updateTitleBar({ progress: 50 })
     }
   }
 
@@ -29,7 +33,6 @@ export default class BootloaderUpdated extends Component {
   render() {
     if (this.state.readyForFirmwareUpdate) {
       const { bootloaderVersion } = this.props.features
-      this.props.updateTitleBar({ title: 'Bootloader Updated', progress: 100 })
       return(
         <div>
           <h1>Bootloader Updated</h1>
@@ -52,7 +55,6 @@ export default class BootloaderUpdated extends Component {
         </div>
       )
     }
-    this.props.updateTitleBar({ progress: 50 })
     return(
       <Fragment>
         <div style={{ ...stepAndImageContainerStyles, height: 140 }}>

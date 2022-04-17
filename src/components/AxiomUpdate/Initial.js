@@ -22,6 +22,9 @@ export default class Initial extends Component {
     if(approved && bootloaderMode) {
       transitionState(start)
     }
+    if (!(!this.state.initializedConfirmed) && !(deviceIsInitialized && !backupConfirmed) && !bootloaderMode) {
+      this.props.updateTitleBar({ progress: 25 })
+    }
     return null;
   }
 
@@ -87,7 +90,6 @@ export default class Initial extends Component {
     const bootloaderMode = features && features.bootloader_mode;
 
     if(!bootloaderMode) {
-      this.props.updateTitleBar({ progress: 25 })
       return(
         <Fragment>
           <h2 style={{ fontSize: '29px', fontWeight: 400, color: '#ffffff' }}>Ready to Update</h2>
