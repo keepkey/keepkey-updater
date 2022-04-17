@@ -85,7 +85,7 @@ export default ({ features, initiateUpdate, latest, connecting, updateTitleBar }
       </div>
       <div style={{ display: 'flex', justifyContent: 'center' }}>
       { !updateRequired &&
-          <Button primary onClick={goToShapeshift} style={{ fontWeight: 400, fontSize: '18px' }}>
+          <Button primary onClick={goToShapeshift} style={{ fontWeight: 400, fontSize: '18px', marginBottom: '15px' }}>
             Head over to ShapeShift!
           </Button>
       }
