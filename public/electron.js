@@ -185,8 +185,10 @@ usbDetect.on('add:11044:1', async function(device) {
   mainWindow.webContents.send('connecting', false)
 });
 
-usbDetect.on('remove:11044:1', function(device) {
-  keyring.removeAll()
+usbDetect.on('remove:11044:1', async function(device) {
+  const wallet = Object.values(keyring.wallets)[0]
+  if (!!wallet) wallet.transport.disconnect()
+  await keyring.removeAll()
   mainWindow.webContents.send('features', null);
   mainWindow.webContents.send('connecting', false);
 });
@@ -194,9 +196,9 @@ usbDetect.on('remove:11044:1', function(device) {
 usbDetect.on('add:11044:2', async function(device) {
   mainWindow.webContents.send('connecting', true)
   const wallet = await createWebUsbWallet()
-  mainWindow.webContents.send('connecting', false)
   const features = wallet ? wallet.features : null
   mainWindow.webContents.send('features', await normalizeFeatures(features))
+  mainWindow.webContents.send('connecting', false)
 });
 
 usbDetect.on('remove:11044:2', async function(device) {
