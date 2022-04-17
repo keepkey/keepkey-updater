@@ -232,6 +232,7 @@ electron.ipcMain.on('app-start', async (event, arg) => {
   } catch (error) {
     console.log('failed to fetch firmware info or binaries: ', error)
     mainWindow.webContents.send('error', 'ERROR FETCHING RELEASE DATA');
+    mainWindow.webContents.send('latest', {});
   }
   mainWindow.webContents.send('connecting', false)
 });

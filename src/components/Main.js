@@ -138,7 +138,7 @@ export default class Main extends Component {
       );
     }
 
-    if(!!error) {
+    if(!!error && !(features && features.bootloaderMode)) {
       return(
         <div style={{textAlign: 'center', marginTop: 100, fontWeight: 600}}>
           <p>
