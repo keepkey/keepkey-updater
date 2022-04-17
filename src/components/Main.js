@@ -25,6 +25,15 @@ const imageStyles = {
   marginTop: 20
 }
 
+const appVersionStyles = {
+  display: 'block',
+  position: 'absolute',
+  right: 0,
+  bottom: 0,
+  padding: '5px 10px',
+  opacity: '40%',
+}
+
 export default class Main extends Component {
   constructor(props) {
     super(props);
@@ -37,6 +46,7 @@ export default class Main extends Component {
       error: null,
       title: 'KeepKey Updater',
       progress: 0,
+      appVersion: null,
     }
     this.updateFeatures = this.updateFeatures.bind(this);
     this.updateConnecting = this.updateConnecting.bind(this);
@@ -45,6 +55,7 @@ export default class Main extends Component {
     this.handleLatest = this.handleLatest.bind(this);
     this.handleError = this.handleError.bind(this);
     this.updateTitleBar = this.updateTitleBar.bind(this);
+    this.handleAppVersion = this.handleAppVersion.bind(this);
   }
 
   updateFeatures(event, message) {
@@ -57,6 +68,10 @@ export default class Main extends Component {
 
   handleLatest(event, message) {
     this.setState({ latest: message })
+  }
+
+  handleAppVersion(event, message) {
+    this.setState({ appVersion: message })
   }
 
   updateTitleBar(update) {
@@ -109,6 +124,7 @@ export default class Main extends Component {
     ipcRenderer.on('uncaught-exception', this.uncaughtException);
     ipcRenderer.on('latest', this.handleLatest);
     ipcRenderer.on('error', this.handleError);
+    ipcRenderer.on('app-version', this.handleAppVersion);
   }
 
   componentWillUnmount() {
@@ -117,7 +133,7 @@ export default class Main extends Component {
   }
 
   render() {
-    const { error, features, connecting, updating, start, latest, title } = this.state;
+    const { error, features, connecting, updating, start, latest, title, appVersion } = this.state;
 
     if(updating) {
       return(
@@ -176,9 +192,8 @@ export default class Main extends Component {
             connecting={connecting}
           />
           }
+        { !!appVersion && <div style={appVersionStyles}>{appVersion}</div> }
       </div>
     );
   }
 }
-
-

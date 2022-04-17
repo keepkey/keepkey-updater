@@ -212,6 +212,7 @@ usbDetect.on('remove:11044:2', async function(device) {
 
 electron.ipcMain.on('app-start', async (event, arg) => {
   try {
+    mainWindow.webContents.send('app-version', `v${app.getVersion()}`);
     mainWindow.webContents.send('latest', (await getFirmwareData()).latest);
     let connectedDeviceProductId
     await usbDetect.find(0x2b24, function(err, foundDevices) { connectedDeviceProductId = foundDevices.length ? foundDevices[0].productId : null })
