@@ -10,7 +10,8 @@ module.exports = async function fetch(url, options) {
   const urlObj = new URL(request.url)
   if (urlObj.protocol !== 'file:') return await nodeFetch(url, options);
 
-  const filePath = urlObj.pathname
+  // handle windows file urls
+  const filePath = urlObj.pathname.replace(/^\/(?=[a-z]:\/)/i, "")
   if (!fs.existsSync(filePath)) {
     throw new Error(`File not found: ${filePath}`);
   }

@@ -16,6 +16,7 @@ const normalizeManifestUrl = (x) => {
   try {
     return new URL(x);
   } catch {
+    if (process.env.PORTABLE_EXECUTABLE_DIR) x = path.resolve(process.env.PORTABLE_EXECUTABLE_DIR, x)
     return url.pathToFileURL(x);
   }
 }

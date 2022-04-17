@@ -40,7 +40,8 @@
       "entitlementsInherit": "assets/build/entitlements.mac.plist"
     },
     "win": {
-      "icon": "build/icon.png"
+      "icon": "build/icon.png",
+      "target": "portable"
     }
   },
   "scripts": {
