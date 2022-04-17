@@ -32,7 +32,7 @@ export default class Initial extends Component {
 
   navigateToAssistance(e) {
     e.preventDefault()
-    const url = 'https://shapeshift.zendesk.com/hc/en-us/categories/360001062760-Beta'
+    const url = 'https://shapeshift.zendesk.com'
     shell.openExternal(url);
   }
 

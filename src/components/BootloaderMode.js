@@ -16,7 +16,7 @@ export default class BootloaderMode extends Component {
   }
 
   navigateToHelp(e) {
-    const url = 'https://shapeshift.zendesk.com/hc/en-us/categories/360001062760-Beta'
+    const url = 'https://shapeshift.zendesk.com'
     shell.openExternal(url)
   }
 
