@@ -359,7 +359,6 @@ app.on('ready', createWindow);
 
 app.on('before-quit', () => {
   usbDetect.stopMonitoring();
-  webUsbAdapter.clearDevices()
   ipcMain.removeAllListeners('app-start');
   ipcMain.removeAllListeners('update-firmware');
   ipcMain.removeAllListeners('update-bootloader');
