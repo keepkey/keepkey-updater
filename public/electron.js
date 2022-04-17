@@ -283,11 +283,10 @@ electron.ipcMain.on('update-firmware', async (event, arg) => {
     if(updateResponse) {
       mainWindow.webContents.send('update-status', 'FIRMWARE_UPDATE_SUCCESS');
     } else {
-      mainWindow.webContents.send('update-status', 'FIRMWARE_UPDATE_SUCCESS');
-      // mainWindow.webContents.send('update-status', 'FAILED');
+      mainWindow.webContents.send('update-status', 'FAILED');
     }
   } catch(err) {
-    console.log('failed to upload binary to device: ', err);
+    console.error('failed to upload firmware to device: ', err);
     mainWindow.webContents.send('update-status', 'FAILED');
   }
 });
@@ -299,10 +298,10 @@ electron.ipcMain.on('update-bootloader', async (event, arg) => {
     if(updateResponse) {
       mainWindow.webContents.send('update-status', 'BOOTLOADER_UPDATE_SUCCESS');
     } else {
-      // mainWindow.webContents.send('update-status', 'FAILED');
-      mainWindow.webContents.send('update-status', 'BOOTLOADER_UPDATE_SUCCESS');
+      mainWindow.webContents.send('update-status', 'FAILED');
     }
-  } catch(err) {
+  } catch (err) {
+    console.error('failed to upload bootloader to device: ', err);
     mainWindow.webContents.send('update-status', 'FAILED');
   }
 });

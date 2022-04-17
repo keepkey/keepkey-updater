@@ -72,6 +72,7 @@ export default class AxiomUpdate extends Component {
       deviceIsInitialized,
       transitionState: this.transitionState
     };
+    console.log(`updateState: ${updateState}`);
     switch(updateState) {
       case 'initial':
         const initialProps = { ...shared, setDeviceIsInitialized: this.setDeviceIsInitialized }
