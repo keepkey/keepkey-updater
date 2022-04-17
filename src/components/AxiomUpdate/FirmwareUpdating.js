@@ -30,7 +30,7 @@ export default class FirmwareUpdating extends Component {
           <Fragment>
             <p>
               Since this is a new device, ignore the statement on the KeepKey screen
-              that says "Verify Backup" (You'll get a recovery sentence later)
+              that says "Verify Backup". (You'll get a recovery sentence later.)
             </p>
             <p>
               Just hold down the button on your KeepKey until the device displays
