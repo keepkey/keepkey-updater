@@ -1,6 +1,7 @@
 const electron = require('electron');
 const app = electron.app;
 const dialog = electron.dialog;
+const ipcMain = electron.ipcMain;
 const BrowserWindow = electron.BrowserWindow;
 const path = require('path');
 const isDev = require('electron-is-dev');
@@ -370,12 +371,10 @@ app.on('ready', createWindow);
 app.on('before-quit', () => {
   usbDetect.stopMonitoring();
   webUsbAdapter.clearDevices()
-  const { ipcMain } = electron;
   ipcMain.removeAllListeners('app-start');
   ipcMain.removeAllListeners('update-firmware');
   ipcMain.removeAllListeners('update-bootloader');
   ipcMain.removeAllListeners('update-custom');
-  ipcMain.removeAllListeners('set-policy');
 });
 
 app.on('window-all-closed', () => {
