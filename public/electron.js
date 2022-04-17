@@ -118,7 +118,7 @@ const wipeDevice = async () => {
     const result = await wallet.wipe()
     return result
   } catch (error) {
-    console.log('error uploading to device: ', error)
+    console.log('error wiping device: ', error)
     return false
   }
 }
