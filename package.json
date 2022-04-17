@@ -1,9 +1,9 @@
 {
-  "name": "kk-updater",
+  "name": "keepkey-updater",
   "version": "2.1.0",
   "private": true,
   "main": "public/electron.js",
-  "author": "keepkey",
+  "author": "KeepKey",
   "homepage": "./",
   "dependencies": {
     "@shapeshiftoss/hdwallet-core": "1.19.2-alpha.1",

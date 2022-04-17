@@ -339,7 +339,7 @@ async function createWindow() {
   mainWindow = new BrowserWindow({
     width: 407,
     height: 525,
-    title: '',
+    title: 'KeepKey Updater',
     resizable: isDev,
     autoHideMenuBar: true,
     show: false,
