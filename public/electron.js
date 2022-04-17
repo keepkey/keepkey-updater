@@ -336,8 +336,9 @@ async function createWindow() {
     },
   });
   if (!isDev) mainWindow.removeMenu();
-  mainWindow.loadURL(isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, '../build/index.html')}`);
+  const bundledIndexPath = `file://${path.join(__dirname, '../build/index.html')}`;
   mainWindow.on('closed', () => mainWindow = null);
+  await mainWindow.loadURL(isDev ? 'http://localhost:3000' : bundledIndexPath).catch(() => mainWindow.loadURL(bundledIndexPath));
 }
 
 app.on('ready', createWindow);
