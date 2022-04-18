@@ -257,13 +257,12 @@ electron.ipcMain.on('wipe-keepkey', async (event, updateRequired) => {
       message: 'To reset your device\'s pin, you must wipe and continue.',
       detail: 'This will WIPE your device!',
       checkboxLabel: 'I have my recovery phrase',
-      checkboxChecked: true,
+      checkboxChecked: false,
     };
-    electron.dialog.showMessageBox(null, options, (response, checkboxChecked) => {
-      if(response === 1 && checkboxChecked){
-        wipeDevice()
-      }
-    });
+    const msgBoxResp = await electron.dialog.showMessageBox(null, options)
+    if (msgBoxResp.response === 1 && msgBoxResp.checkboxChecked){
+      await wipeDevice()
+    }
   } catch(err) {
     console.error('failed to wipe device: ', err);
     mainWindow.webContents.send('update-status', 'FAILED');
