@@ -3,11 +3,10 @@ import { Button } from 'semantic-ui-react'
 
 import useKeyPress from '../hooks/useKeyPress';
 
-const { shell } = window.require('electron');
+const { ipcRenderer } = window.require('electron');
 
 function navigateToHelp(e) {
-  const url = 'https://shapeshift.zendesk.com/'
-  shell.openExternal(url)
+  ipcRenderer.send('get-help')
 }
 
 function renderWarning(props, state, setState, showCustom) {

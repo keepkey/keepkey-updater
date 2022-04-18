@@ -2,7 +2,7 @@ import React, { Component, Fragment } from 'react';
 import { Button } from 'semantic-ui-react';
 import HoldAndConnect from '../../images/hold-and-connect.svg';
 
-const { shell } = window.require('electron');
+const { ipcRenderer } = window.require('electron');
 
 export default class Initial extends Component {
   constructor(props) {
@@ -35,8 +35,7 @@ export default class Initial extends Component {
 
   navigateToAssistance(e) {
     e.preventDefault()
-    const url = 'https://shapeshift.zendesk.com'
-    shell.openExternal(url);
+    ipcRenderer.send('get-help')
   }
 
   render() {

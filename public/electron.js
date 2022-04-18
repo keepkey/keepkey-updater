@@ -341,6 +341,10 @@ electron.ipcMain.on('go-to-shapeshift', async (event, arg) => {
   await closeApp()
 });
 
+electron.ipcMain.on('get-help', async (event, arg) => {
+  await electron.shell.openExternal('https://shapeshift.zendesk.com')
+});
+
 // =======================================================================================
 // app creation
 

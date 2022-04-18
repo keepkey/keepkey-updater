@@ -1,18 +1,10 @@
 import React, { Component, Fragment } from 'react';
 import HoldAndRelease from '../../images/hold-and-release.svg';
 
-const { shell } = window.require('electron');
-
 export default class FirmwareUpdating extends Component {
   componentDidMount() {
     setTimeout(this.props.updateFirmware, 300) // allow time for render before halting the process
     this.props.updateTitleBar({ title: 'Firmware Update', progress: 50 })
-  }
-
-  openHelpArticle(e) {
-    e.preventDefault()
-    const url = 'https://app.shapeshift.com'
-    shell.openExternal(url)
   }
 
   render() {

@@ -5,7 +5,7 @@ import Loading from './Loading';
 import AxiomUpdate from './AxiomUpdate';
 import FoxLogo from '../images/fox-logo.svg';
 
-const { shell, ipcRenderer } = window.require('electron');
+const { ipcRenderer } = window.require('electron');
 
 const appHeaderStyles = {
   textAlign: 'center',
@@ -99,8 +99,7 @@ export default class Main extends Component {
 
   contactSupport = (e) => {
     e.preventDefault();
-    const url = 'https://shapeshift.zendesk.com'
-    shell.openExternal(url);
+    ipcRenderer.send('get-help')
   }
 
   progressBar() {
