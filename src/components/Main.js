@@ -22,7 +22,7 @@ const appTitleStyles = {
 const imageStyles = {
   display: 'block',
   margin: 'auto',
-  marginTop: 20
+  marginTop: 15
 }
 
 const appVersionStyles = {

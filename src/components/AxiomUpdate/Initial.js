@@ -65,12 +65,12 @@ export default class Initial extends Component {
       return(
         <div style={{ textAlign: 'left', fontSize: '14px' }}>
           <h1 style={{ textAlign: 'center', color: '#FFFFFF' }}>Before You Proceed</h1>
-          <div>Only continue if you have your recovery sentence.</div>
-          <div>
+          <div style={{ margin: '1em 0' }}>Only continue if you have your recovery sentence.</div>
+          <div style={{ margin: '1em 0' }}>
             In the unlikely event that something goes wrong, you might not be able to access
             your funds without your recovery sentence.
           </div>
-          <div style={{ display: 'flex', justifyContent: 'center', padding: '15px 5px' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', padding: '0 5px 15px 5px' }}>
             <Button
               primary
               style={{ width: '100%' }}
@@ -124,6 +124,6 @@ const warningLinksStyles = {
   flexDirection: 'column',
   justifyContent: 'space-between',
   alignItems: 'center',
-  height: 75,
+  height: 67,
   fontWeight: 600
 }
