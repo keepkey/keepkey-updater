@@ -1,6 +1,7 @@
 *
 !/.circleci/
 !/.circleci/**
+!/.env
 !/.gitattributes
 !/.gitignore
 !/.nvmrc
