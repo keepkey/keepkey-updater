@@ -253,15 +253,19 @@ electron.ipcMain.on('wipe-keepkey', async (event, updateRequired) => {
       type: 'question',
       buttons: ['cancel', 'wipe device'],
       defaultId: 2,
-      title: 'Question',
-      message: 'To reset your device\'s pin, you must wipe and continue.',
+      title: 'Reset Device',
+      message: 'To remove your PIN, you must reset your device to factory settings.',
       detail: 'This will WIPE your device!',
       checkboxLabel: 'I have my recovery phrase',
       checkboxChecked: false,
     };
     const msgBoxResp = await electron.dialog.showMessageBox(null, options)
-    if (msgBoxResp.response === 1 && msgBoxResp.checkboxChecked){
-      await wipeDevice()
+    if (msgBoxResp.response === 1){
+      if (msgBoxResp.checkboxChecked) {
+        await wipeDevice()
+      } else {
+        electron.dialog.showErrorBox('Reset Device', 'Confirm that you have your recovery phrase available before wiping your device.')
+      }
     }
   } catch(err) {
     console.error('failed to wipe device: ', err);
