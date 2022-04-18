@@ -337,6 +337,7 @@ electron.ipcMain.on('close-application', async (event, arg) => {
 // app creation
 
 async function createWindow() {
+  if (!isDev) electron.Menu.setApplicationMenu(electron.Menu.buildFromTemplate([]));
   mainWindow = new BrowserWindow({
     width: 407,
     height: 525,
@@ -351,7 +352,9 @@ async function createWindow() {
       webSecurity: true,
     },
   });
-  if (!isDev) mainWindow.removeMenu();
+  if (!isDev) {
+    mainWindow.removeMenu();
+  }
   const bundledIndexPath = `file://${path.join(__dirname, '../build/index.html')}`;
   mainWindow.on('closed', () => mainWindow = null);
   mainWindow.on('ready-to-show', () => mainWindow.show());
@@ -369,9 +372,7 @@ app.on('before-quit', () => {
 });
 
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
+  app.quit();
 });
 
 app.on('activate', () => {
