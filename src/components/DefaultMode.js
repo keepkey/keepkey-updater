@@ -3,7 +3,7 @@ import Updatable from './Updatable';
 import { Button } from 'semantic-ui-react'
 import semverCmp from 'semver-compare'
 
-const { shell, ipcRenderer } = window.require('electron');
+const { ipcRenderer } = window.require('electron');
 
 const stripV = (version) => version.replace(/v/g, '')
 
@@ -38,9 +38,7 @@ export default ({ features, initiateUpdate, latest, connecting, updateTitleBar }
 
   const goToShapeshift = (e) => {
     e.preventDefault();
-    const url = 'https://app.shapeshift.com';
-    shell.openExternal(url);
-    ipcRenderer.send('close-application')
+    ipcRenderer.send('go-to-shapeshift')
   }
 
   const forgotPin = (e) => {

@@ -321,7 +321,7 @@ electron.ipcMain.on('update-custom', async (event, arg) => {
   }
 });
 
-electron.ipcMain.on('close-application', async (event, arg) => {
+const closeApp = async () => {
   try {
     const wallet = Object.values(keyring.wallets)[0]
     if (!!wallet) wallet.transport.disconnect()
@@ -330,6 +330,15 @@ electron.ipcMain.on('close-application', async (event, arg) => {
   } catch(err) {
     console.log('Error closing application: ', err)
   }
+}
+
+electron.ipcMain.on('close-application', async (event, arg) => {
+  await closeApp()
+});
+
+electron.ipcMain.on('go-to-shapeshift', async (event, arg) => {
+  await electron.shell.openExternal('https://app.shapeshift.com')
+  await closeApp()
 });
 
 // =======================================================================================
