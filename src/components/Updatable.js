@@ -16,13 +16,13 @@ export default (props) => {
         {version}
       </div>
       { showStatus ?
-        <div style={{ fontSize: 13, fontWeight: 600, flex: 3, paddingLeft: 20 }}>
+        <div style={{ fontSize: 13, fontWeight: 600, flex: 3.5, paddingLeft: 20 }}>
           {current ?
             <span style={{ color: '#66BB69' }}>&#10004;</span> :
             <a style={{ cursor: 'pointer', textDecoration: 'underline' }} onClick={handleUpdateClick}>Update Now</a>
           }
         </div> :
-        <div style={{ flex: 3, paddingLeft: 20 }}></div>
+        <div style={{ flex: 3.5, paddingLeft: 20 }}></div>
       }
     </div>
   )

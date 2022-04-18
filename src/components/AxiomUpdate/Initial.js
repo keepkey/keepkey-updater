@@ -63,7 +63,7 @@ export default class Initial extends Component {
 
     if(deviceIsInitialized && !backupConfirmed) {
       return(
-        <div style={{ textAlign: 'left', fontSize: '15px' }}>
+        <div style={{ textAlign: 'left', fontSize: '14px' }}>
           <h1 style={{ textAlign: 'center', color: '#FFFFFF' }}>Before You Proceed</h1>
           <div>Only continue if you have your recovery sentence.</div>
           <div>
