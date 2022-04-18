@@ -15,7 +15,7 @@
     "node-hid": "^2.1.1",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
-    "react-scripts": "1.1.5",
+    "react-scripts": "^5.0.1",
     "semantic-ui-react": "^0.84.0",
     "semver-compare": "^1.0.0",
     "usb-detection": "~4.13.0",
@@ -54,7 +54,6 @@
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
     "electron-pack": "yarn run dist --c.extraMetadata.main=build/electron.js",
-    "notarize": "scripts/notarize.js",
     "preelectron-pack": "yarn build",
     "postinstall": "electron-builder install-app-deps"
   },
@@ -63,5 +62,17 @@
     "electron": "~13.1.8",
     "electron-builder": "^22.11.7",
     "wait-on": "^6.0.0"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }
