@@ -157,7 +157,7 @@ export default class Main extends Component {
       return(
         <div style={{textAlign: 'center', marginTop: 100, fontWeight: 600}}>
           <p>
-            Something went wrong when trying to fetch data from ShapeShift.
+            Something went wrong when trying to fetch firmware data.
             Please check your internet connnection and try again.
           </p>
           <p>{ error }</p>

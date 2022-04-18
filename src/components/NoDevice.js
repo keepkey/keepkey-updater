@@ -7,8 +7,8 @@ const NoDevice = ({ updateTitleBar }) => {
     <div style={noDeviceStyles}>
       <h1 style={{ color: '#ffffff' }}>No Device Connected</h1>
       <span style={{ fontSize: '15px' }}>
-        If your KeepKey is connected, make sure you do not have the KeepKey Desktop App
-        running or the ShapeShift platform running, and try reconnecting your KeepKey.
+        If your KeepKey is connected, make sure that it's not being used by
+        another app or website, and then try unplugging it and plugging it back in.
       </span>
       <img style={ConnectKeepKeyStyles} src={ConnectKeepKey} alt="device outline" />
     </div>

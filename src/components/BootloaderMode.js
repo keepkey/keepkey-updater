@@ -18,7 +18,7 @@ function renderWarning(props, state, setState, showCustom) {
       </p>
       <div style={{ width: 100, height: 1, margin: '10px auto',  backgroundColor: 'rgb(135, 152, 173)' }} />
       <p>
-        If you're following the instructions of a ShapeShift customer support agent, you're
+        If you're following the instructions of a KeepKey customer support agent, you're
         in the right place.
       </p>
       <p><a style={{ cursor: 'pointer' }} onClick={() => setState({ showUpdates: true })}>
