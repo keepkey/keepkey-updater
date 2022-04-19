@@ -1573,41 +1573,41 @@
     varuint-bitcoin "^1.0.4"
     wif "^2.0.1"
 
-"@shapeshiftoss/hdwallet-core@1.19.2-alpha.1":
-  version "1.19.2-alpha.1"
-  resolved "https://registry.yarnpkg.com/@shapeshiftoss/hdwallet-core/-/hdwallet-core-1.19.2-alpha.1.tgz#554ebad7c1faf45cf164e9522d74775813333107"
-  integrity sha512-VQGr914ZJbWkozlqWt93XKNeZznerkIHudDvM3e6hKOXcRoUDwwW9+us94Usq/BMvlI/LZXoTLs6UY2eB2gszA==
+"@shapeshiftoss/hdwallet-core@1.20.1":
+  version "1.20.1"
+  resolved "https://registry.yarnpkg.com/@shapeshiftoss/hdwallet-core/-/hdwallet-core-1.20.1.tgz#da2e8dfb77330518ba91c3ecb459801eeb53aeb9"
+  integrity sha512-inY3MJc9nqutpzP8zd4LkTd79rf1N1xTjB++FAl7UF3R8FrL6vlAzNBRHgKLqyAeFeHAz4uhinc9uFwLWeV/VQ==
   dependencies:
     eventemitter2 "^5.0.1"
     lodash "^4.17.21"
     rxjs "^6.4.0"
     type-assertions "^1.1.0"
 
-"@shapeshiftoss/hdwallet-keepkey-nodehid@1.19.2-alpha.1":
-  version "1.19.2-alpha.1"
-  resolved "https://registry.yarnpkg.com/@shapeshiftoss/hdwallet-keepkey-nodehid/-/hdwallet-keepkey-nodehid-1.19.2-alpha.1.tgz#73c5ed2ac077fbd07733404d24547ed1189463ff"
-  integrity sha512-fZJjhPDs5dcTZUvzlwASVeaZUZD3EUrdldpotjBKujajPJt9MGhjQS1lBLrKeu125Q4dIecAnDkjz3aqfjtLMQ==
+"@shapeshiftoss/hdwallet-keepkey-nodehid@1.20.1":
+  version "1.20.1"
+  resolved "https://registry.yarnpkg.com/@shapeshiftoss/hdwallet-keepkey-nodehid/-/hdwallet-keepkey-nodehid-1.20.1.tgz#aa9c1dccad07b246aba68df827535fcd81d04a54"
+  integrity sha512-F98wqoLd+Uv1vuh5GtdD7CVGA098V9gQLv+9+iO2D8cTx46LlJzq2+0GoW2CfQXh6pB3ttAB0cguaq3AQWpzQg==
   dependencies:
-    "@shapeshiftoss/hdwallet-keepkey" "1.19.2-alpha.1"
+    "@shapeshiftoss/hdwallet-keepkey" "1.20.1"
 
-"@shapeshiftoss/hdwallet-keepkey-nodewebusb@1.19.2-alpha.1":
-  version "1.19.2-alpha.1"
-  resolved "https://registry.yarnpkg.com/@shapeshiftoss/hdwallet-keepkey-nodewebusb/-/hdwallet-keepkey-nodewebusb-1.19.2-alpha.1.tgz#3b28488604e24a0ff754d2296ab5a083e8a38ed6"
-  integrity sha512-n6VurJgf7zDKheXSqBn+j4KkoVl4OH0RhmypFrqSMAYmAPHO0/gmDPihdj0CAdzSKjQs/ZgHg7bH77U7YBmJDQ==
+"@shapeshiftoss/hdwallet-keepkey-nodewebusb@1.20.1":
+  version "1.20.1"
+  resolved "https://registry.yarnpkg.com/@shapeshiftoss/hdwallet-keepkey-nodewebusb/-/hdwallet-keepkey-nodewebusb-1.20.1.tgz#fb132bccf7d26142563250a456fa2def9f75266e"
+  integrity sha512-P69xz+86TOKdGsmFj/xjMsZ1GQADK/+3wkEdjDtP/Miw3XT/dNN6r66Qb4/SMFvAbZ5zxp8HbFtWEsBBEMKtIA==
   dependencies:
-    "@shapeshiftoss/hdwallet-core" "1.19.2-alpha.1"
-    "@shapeshiftoss/hdwallet-keepkey" "1.19.2-alpha.1"
+    "@shapeshiftoss/hdwallet-core" "1.20.1"
+    "@shapeshiftoss/hdwallet-keepkey" "1.20.1"
 
-"@shapeshiftoss/hdwallet-keepkey@1.19.2-alpha.1":
-  version "1.19.2-alpha.1"
-  resolved "https://registry.yarnpkg.com/@shapeshiftoss/hdwallet-keepkey/-/hdwallet-keepkey-1.19.2-alpha.1.tgz#9f3ab3e0b03a3eec816af2f6671edd0d964087b2"
-  integrity sha512-kIl1C8n59WUb0Qk9FJasd00aOJ6yVJfYADawA3WfZlTO4u8U0Gwu91D6VV+JK1wAxlZPYlSkNX0vtlElQtdnAw==
+"@shapeshiftoss/hdwallet-keepkey@1.20.1":
+  version "1.20.1"
+  resolved "https://registry.yarnpkg.com/@shapeshiftoss/hdwallet-keepkey/-/hdwallet-keepkey-1.20.1.tgz#63fc9404b7be87c8807e713bfbbc03ee69520e3c"
+  integrity sha512-cvt+KqDd7AFShiifW47PLEBMoeUMu5wzfJ0X3BhpJr0CFvPFbEI5aZ1euL9mJLtpvV1HMseKri7BNrGvYxW3iw==
   dependencies:
     "@ethereumjs/common" "^2.4.0"
     "@ethereumjs/tx" "^3.3.0"
     "@keepkey/device-protocol" "^7.8.1"
     "@shapeshiftoss/bitcoinjs-lib" "5.2.0-shapeshift.2"
-    "@shapeshiftoss/hdwallet-core" "1.19.2-alpha.1"
+    "@shapeshiftoss/hdwallet-core" "1.20.1"
     bignumber.js "^9.0.1"
     bnb-javascript-sdk-nobroadcast "^2.16.14"
     crypto-js "^4.0.0"
@@ -1615,6 +1615,7 @@
     google-protobuf "^3.15.8"
     icepick "^2.4.0"
     lodash "^4.17.21"
+    p-lazy "^3.1.0"
     semver "^6.3.0"
     tiny-secp256k1 "^1.1.6"
 
@@ -2017,11 +2018,6 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-14.18.13.tgz#6ad4d9db59e6b3faf98dcfe4ca9d2aec84443277"
   integrity sha512-Z6/KzgyWOga3pJNS42A+zayjhPbf2zM3hegRQaOPnLOzEi86VV++6FLDWgR1LGrVCRufP/ph2daa3tEa5br1zA==
 
-"@types/node@^8.0.54":
-  version "8.10.66"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.10.66.tgz#dd035d409df322acc83dff62a602f12a5783bbb3"
-  integrity sha512-tktOkFUA4kXx2hhhrB8bIFb5TbwzS4uOhKEmwiD+NoiL0qtP2OQ9mFldbgD4dV1djrlBYP6eBuQZiWjuHUpqFw==
-
 "@types/parse-json@^4.0.0":
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/@types/parse-json/-/parse-json-4.0.0.tgz#2f8bb441434d163b35fb8ffdccd7138927ffb8c0"
@@ -2113,19 +2109,12 @@
   resolved "https://registry.yarnpkg.com/@types/trusted-types/-/trusted-types-2.0.2.tgz#fc25ad9943bcac11cceb8168db4f275e0e72e756"
   integrity sha512-F5DIZ36YVLE+PN+Zwws4kJogq47hNgX3Nx6WyDJ3kcplxyke3XIzB8uK5n/Lpm1HBsbGzd6nmGehL8cPekP+Tg==
 
-"@types/usb@^1.5.1":
-  version "1.5.4"
-  resolved "https://registry.yarnpkg.com/@types/usb/-/usb-1.5.4.tgz#366b353373ee92d34e0abcc5138c9b1fcdd75dc4"
-  integrity sha512-NOUza/8yuswu6RoECQyPHEjA34qpDaeONQ72fm+bCnnN2DJjDePAY+NsmV17H88oIlq4JlJ2mD5Kh5d6R2MwTQ==
-  dependencies:
-    "@types/node" "*"
-
 "@types/verror@^1.10.3":
   version "1.10.5"
   resolved "https://registry.yarnpkg.com/@types/verror/-/verror-1.10.5.tgz#2a1413aded46e67a1fe2386800e291123ed75eb1"
   integrity sha512-9UjMCHK5GPgQRoNbqdLIAvAy0EInuiqbW0PBMtVP6B5B2HQJlvoJHM+KodPZMEjOa5VkSc+5LH7xy+cUzQdmHw==
 
-"@types/w3c-web-usb@^1.0.4":
+"@types/w3c-web-usb@1.0.6":
   version "1.0.6"
   resolved "https://registry.yarnpkg.com/@types/w3c-web-usb/-/w3c-web-usb-1.0.6.tgz#5d8560d0d9f585ffc80865bc773db7bc975b680c"
   integrity sha512-cSjhgrr8g4KbPnnijAr/KJDNKa/bBa+ixYkywFRvrhvi9n1WEl7yYbtRyzE6jqNQiSxxJxoAW3STaOQwJHndaw==
@@ -7898,6 +7887,11 @@ p-cancelable@^1.0.0:
   resolved "https://registry.yarnpkg.com/p-cancelable/-/p-cancelable-1.1.0.tgz#d078d15a3af409220c886f1d9a0ca2e441ab26cc"
   integrity sha512-s73XxOZ4zpt1edZYZzvhqFa6uvQc1vwUa0K0BdtIZgQMAJj9IbebH+JkgKZc9h+B05PKHLOTl4ajG1BmNrVZlw==
 
+p-lazy@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/p-lazy/-/p-lazy-3.1.0.tgz#4b1e40482b7ee87853abbcf31824ff64e1816d61"
+  integrity sha512-sCJn0Cdahs6G6SX9+DUihVFUhrzDEduzE5xeViVBGtoqy5dBWko7W8T6Kk6TjR2uevRXJO7CShfWrqdH5s3w3g==
+
 p-limit@^1.1.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/p-limit/-/p-limit-1.3.0.tgz#b86bd5f0c25690911c7590fcbfc2010d54b3ccb8"
@@ -10655,11 +10649,12 @@ usb-detection@~4.13.0:
     nan "^2.15.0"
     prebuild-install "^6.1.4"
 
-usb@^1.6.0:
-  version "1.9.2"
-  resolved "https://registry.yarnpkg.com/usb/-/usb-1.9.2.tgz#fb6b36f744ecc707a196c45a6ec72442cb6f2b73"
-  integrity sha512-dryNz030LWBPAf6gj8vyq0Iev3vPbCLHCT8dBw3gQRXRzVNsIdeuU+VjPp3ksmSPkeMAl1k+kQ14Ij0QHyeiAg==
+usb@^2.3.1:
+  version "2.3.1"
+  resolved "https://registry.yarnpkg.com/usb/-/usb-2.3.1.tgz#6dca3b4308dbe22ef012d44fd55040ba240cbd00"
+  integrity sha512-UdlcYC5rFhjFi2/NFfCz1HPoo5bQnDiB9916pg61gMyapoPgSNicGHdpQwia2UeVilDW/LZhUMiwOv5sYOkI9Q==
   dependencies:
+    "@types/w3c-web-usb" "1.0.6"
     node-addon-api "^4.2.0"
     node-gyp-build "^4.3.0"
 
@@ -10953,16 +10948,6 @@ websocket-stream@^5.5.0:
     safe-buffer "^5.1.2"
     ws "^3.2.0"
     xtend "^4.0.0"
-
-webusb@^2.2.0:
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/webusb/-/webusb-2.2.0.tgz#2e666afb182e6a6a1e9e279cc3a343b10aad7a5e"
-  integrity sha512-EP6JOFIqR4vLoDWwtMROs94Sl/sZlmX1WApK9O8/rBMBEiYTrDlgQrfUQ4CW5o+GSxfbA+MpDRgGbEBa5q0ECw==
-  dependencies:
-    "@types/node" "^8.0.54"
-    "@types/usb" "^1.5.1"
-    "@types/w3c-web-usb" "^1.0.4"
-    usb "^1.6.0"
 
 whatwg-encoding@^1.0.5:
   version "1.0.5"
