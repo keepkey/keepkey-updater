@@ -57,6 +57,11 @@ export default class Initial extends Component {
               onClick={() => this.handleSetInitialized(true)}
             >I'VE SET UP THIS KEEPKEY BEFORE</Button>
           </div>
+          <div style={warningLinksStyles}>
+            <div style={{margin: '1.5em 0'}}>
+              <a style={{ cursor: 'pointer' }} onClick={cancel}>CANCEL UPDATE</a>
+            </div>
+          </div>
         </div>
       )
     }
