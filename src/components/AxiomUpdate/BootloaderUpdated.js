@@ -57,38 +57,11 @@ export default class BootloaderUpdated extends Component {
     }
     return(
       <Fragment>
-        <div style={{ ...stepAndImageContainerStyles, height: 140 }}>
-          <div style={stepContainerStyles}>
-            <div style={stepNumberStyles}>1</div>
-            <div style={stepTextStyles}>
-              Disconnect your KeepKey and reconnect it.
-            </div>
-          </div>
-          <img
-            style={connectImageStyles}
-            src={ConnectKeepKey}
-            alt="reconnect keepkey"
-          />
-        </div>
-        <div style={{ ...stepAndImageContainerStyles, height: 214 }}>
-          <div style={stepContainerStyles}>
-            <div style={stepNumberStyles}>2</div>
-            <div style={stepTextStyles}>
-              When you see the confirmation on your KeepKey that the bootloader
-              has successfully updated, please disconnect your KeepKey and
-              reconnect it <strong>while holding the button.</strong>
-            </div>
-          </div>
-          <div>
-            <img
-              style={connectAndHoldImageStyles}
-              src={HoldAndConnect}
-              alt="hold and connect keepkey"
-            />
-          </div>
-        </div>
+        <h2 style={{ fontSize: '29px', fontWeight: 400, color: '#ffffff' }}>Ready to Update Bootloader</h2>
+        <span>If your KeepKey does not automatically reboot within the next few seconds, unplug it and plug it back in.</span>
+        <img style={ConnectKeepKeyStyles} src={ConnectKeepKey} alt="device outline" />
       </Fragment>
-      );
+    );
   }
 }
 
