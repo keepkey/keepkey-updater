@@ -10,6 +10,7 @@ const { NodeWebUSBKeepKeyAdapter } = require('@shapeshiftoss/hdwallet-keepkey-no
 const { HIDKeepKeyAdapter } = require('@shapeshiftoss/hdwallet-keepkey-nodehid')
 const { Keyring } = require('@shapeshiftoss/hdwallet-core')
 const url = require('url')
+const crypto = require('crypto')
 const fetch = require('./node-fetch-file-url');
 
 const normalizeManifestUrl = (x) => {
@@ -139,8 +140,13 @@ const getFirmwareData = async () => {
 
 const setTempFirmware = async () => {
   try {
-    const path = (await getFirmwareData()).latest.firmware.url
+    const fwData = await getFirmwareData()
+    const path = fwData.latest.firmware.url
+    const hash = fwData.latest.firmware.hash
     firmwareBinary = await getBinary(path)
+    if (hash && crypto.createHash("sha256").update(firmwareBinary).digest().toString("hex") !== hash) {
+      throw new Error("hash mismatch");
+    }
   } catch (err) {
     console.log({ err })
     mainWindow.webContents.send('error', 'ERROR FETCHING FIRMWARE');
@@ -149,8 +155,13 @@ const setTempFirmware = async () => {
 
 const setTempBlupdater = async () => {
   try {
-    const path = (await getFirmwareData()).latest.bootloader.url
+    const fwData = await getFirmwareData()
+    const path = fwData.latest.bootloader.url
+    const hash = fwData.latest.bootloader.hash
     blupdaterBinary = await getBinary(path)
+    if (hash && crypto.createHash("sha256").update(blupdaterBinary).digest().toString("hex") !== hash) {
+      throw new Error("hash mismatch");
+    }
   } catch (err) {
     console.log({ err })
     mainWindow.webContents.send('error', 'ERROR FETCHING BOOTLOADER');
