@@ -340,8 +340,7 @@ electron.ipcMain.on('close-application', async (event, arg) => {
   await closeApp()
 });
 
-electron.ipcMain.on('go-to-shapeshift', async (event, arg) => {
-  await electron.shell.openExternal('https://app.shapeshift.com')
+electron.ipcMain.on('go-to-app', async (event, arg) => {
   await closeApp()
 });
 

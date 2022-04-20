@@ -36,9 +36,9 @@ export default ({ features, initiateUpdate, firmwareData, connecting, updateTitl
     ipcRenderer.send('update-required', requiredUpdates);
   }
 
-  const goToShapeshift = (e) => {
+  const goToApp = (e) => {
     e.preventDefault();
-    ipcRenderer.send('go-to-shapeshift')
+    ipcRenderer.send('go-to-app')
   }
 
   const forgotPin = (e) => {
@@ -83,8 +83,7 @@ export default ({ features, initiateUpdate, firmwareData, connecting, updateTitl
       </div>
       <div style={{ display: 'flex', justifyContent: 'center' }}>
       { !updateRequired &&
-          <Button primary onClick={goToShapeshift} style={{ fontWeight: 400, fontSize: '18px', marginBottom: '15px' }}>
-            Head over to ShapeShift!
+          <Button primary onClick={goToApp} style={{ fontWeight: 400, fontSize: '18px', marginBottom: '15px' }}>
           </Button>
       }
       </div>
