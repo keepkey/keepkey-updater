@@ -39,14 +39,20 @@ export default class Initial extends Component {
   }
 
   render() {
-    const { features, cancel, deviceIsInitialized } = this.props;
+    const { cancel, deviceIsInitialized, features, firmwareData, start } = this.props;
     const { backupConfirmed, initializedConfirmed } = this.state;
 
     if(!initializedConfirmed) {
       return(
         <div style={{ textAlign: 'center', fontSize: '15px' }}>
           <h1 style={{ color: '#FFFFFF' }}>Start Update</h1>
-          <div>Please select an option:</div>
+          <div style={{ margin: '1.5em 0' }}>{
+            start === "UPDATE_BOOTLOADER" && firmwareData?.latest?.bootloader?.version && firmwareData?.latest?.firmware?.version ?
+            `Your KeepKey will be updated twice; first to bootloader ${firmwareData.latest.bootloader.version}, and then to firmware ${firmwareData.latest.firmware.version}.` :
+            start === "UPDATE_FIRMWARE" && firmwareData?.latest?.firmware?.version ?
+            `Your KeepKey will be updated to firmware ${firmwareData.latest.firmware.version}.` :
+            'Please select an option:'
+          }</div>
           <div style={buttonsContainerStyles}>
             <Button
               primary
