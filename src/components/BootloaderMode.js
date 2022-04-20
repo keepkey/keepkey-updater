@@ -32,8 +32,8 @@ function renderWarning(props, state, setState, showCustom) {
 }
 
 function renderOptions(props, state, setState, showCustom) {
-  const { initiateUpdate, latest, features: { bootloaderVersion }} = props;
-  const latestBootloaderVersion = latest && latest.bootloader && latest.bootloader.version;
+  const { initiateUpdate, firmwareData, features: { bootloaderVersion }} = props;
+  const latestBootloaderVersion = firmwareData?.latest?.bootloader?.version;
   return(
     <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', justifyContent: 'space-around', height: 280 }}>
       { latestBootloaderVersion && <Button primary onClick={() => initiateUpdate('UPDATE_BOOTLOADER')}>Update Bootloader & Firmware</Button> }

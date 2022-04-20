@@ -42,7 +42,7 @@ export default class Main extends Component {
       features: null,
       updating: false,
       start: null,
-      latest: null,
+      firmwareData: null,
       error: null,
       title: 'KeepKey Updater',
       progress: 0,
@@ -52,7 +52,7 @@ export default class Main extends Component {
     this.updateConnecting = this.updateConnecting.bind(this);
     this.initiateUpdate = this.initiateUpdate.bind(this);
     this.uncaughtException = this.uncaughtException.bind(this);
-    this.handleLatest = this.handleLatest.bind(this);
+    this.handleFirmwareData = this.handleFirmwareData.bind(this);
     this.handleError = this.handleError.bind(this);
     this.updateTitleBar = this.updateTitleBar.bind(this);
     this.handleAppVersion = this.handleAppVersion.bind(this);
@@ -66,8 +66,8 @@ export default class Main extends Component {
     this.setState({ connecting: message });
   }
 
-  handleLatest(event, message) {
-    this.setState({ latest: message })
+  handleFirmwareData(event, message) {
+    this.setState({ firmwareData: message })
   }
 
   handleAppVersion(event, message) {
@@ -121,7 +121,7 @@ export default class Main extends Component {
     ipcRenderer.on('features', this.updateFeatures);
     ipcRenderer.on('connecting', this.updateConnecting);
     ipcRenderer.on('uncaught-exception', this.uncaughtException);
-    ipcRenderer.on('latest', this.handleLatest);
+    ipcRenderer.on('firmware-data', this.handleFirmwareData);
     ipcRenderer.on('error', this.handleError);
     ipcRenderer.on('app-version', this.handleAppVersion);
   }
@@ -132,7 +132,7 @@ export default class Main extends Component {
   }
 
   render() {
-    const { error, features, connecting, updating, start, latest, title, appVersion } = this.state;
+    const { error, features, connecting, updating, start, firmwareData, title, appVersion } = this.state;
 
     if(updating) {
       return(
@@ -146,7 +146,7 @@ export default class Main extends Component {
             updateTitleBar={this.updateTitleBar}
             start={start}
             features={features}
-            latest={latest}
+            firmwareData={firmwareData}
             cancel={() => this.setState({ updating: false, title: 'KeepKey Updater', progress: 0 })}
           />
         </div>
@@ -176,18 +176,18 @@ export default class Main extends Component {
           { this.progressBar() }
         </div>
         <img style={imageStyles} src={FoxLogo} alt="fox" />
-        { (connecting || !latest) &&
-          <Loading>{!latest ? 'Fetching Firmware Data' : 'Getting Device Info'}</Loading>
-          }
+        { (connecting || !firmwareData) &&
+          <Loading>{!firmwareData ? 'Fetching Firmware Data' : 'Getting Device Info'}</Loading>
+        }
         { (!connecting && !features) &&
           <NoDevice updateTitleBar={this.updateTitleBar} />
-          }
-        { (!!features && !!latest) &&
+        }
+        { (!!features && !!firmwareData) &&
           <Device
             initiateUpdate={this.initiateUpdate}
             updateTitleBar={this.updateTitleBar}
             features={features}
-            latest={latest}
+            firmwareData={firmwareData}
             connecting={connecting}
           />
           }

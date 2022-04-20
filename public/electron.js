@@ -217,7 +217,7 @@ usbDetect.on('remove:11044:2', async function(device) {
 electron.ipcMain.on('app-start', async (event, arg) => {
   try {
     mainWindow.webContents.send('app-version', `v${app.getVersion()}`);
-    mainWindow.webContents.send('latest', (await getFirmwareData()).latest);
+    mainWindow.webContents.send('firmware-data', await getFirmwareData());
     let connectedDeviceProductId
     await usbDetect.find(0x2b24, function(err, foundDevices) { connectedDeviceProductId = foundDevices.length ? foundDevices[0].productId : null })
     let features, wallet
@@ -237,7 +237,7 @@ electron.ipcMain.on('app-start', async (event, arg) => {
   } catch (error) {
     console.log('failed to fetch firmware info or binaries: ', error)
     mainWindow.webContents.send('error', 'ERROR FETCHING RELEASE DATA');
-    mainWindow.webContents.send('latest', {});
+    mainWindow.webContents.send('firmware-data', {});
   }
   mainWindow.webContents.send('connecting', false)
 });

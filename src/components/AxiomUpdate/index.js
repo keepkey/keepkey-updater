@@ -66,12 +66,12 @@ export default class AxiomUpdate extends Component {
 
   renderUpdateStage() {
     const { updateState, deviceIsInitialized } = this.state;
-    const { features, start, cancel, updateTitleBar, latest } = this.props;
+    const { features, start, cancel, updateTitleBar, firmwareData } = this.props;
     const shared = {
       features,
       start,
       cancel,
-      latest,
+      firmwareData,
       updateTitleBar,
       deviceIsInitialized,
       transitionState: this.transitionState

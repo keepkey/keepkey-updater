@@ -17,12 +17,12 @@ const versionIsUpToDate = (current, target) => {
   }
 };
 
-export default ({ features, initiateUpdate, latest, connecting, updateTitleBar })  => {
+export default ({ features, initiateUpdate, firmwareData, connecting, updateTitleBar })  => {
   const { firmwareVersion, bootloaderVersion } = features;
   let latestFirmwareVersion, latestBootloaderVersion;
-  if (latest) {
-    latestFirmwareVersion = latest.firmware.version;
-    latestBootloaderVersion = latest.bootloader.version;
+  if (firmwareData?.latest) {
+    latestFirmwareVersion = firmwareData?.latest.firmware.version;
+    latestBootloaderVersion = firmwareData?.latest.bootloader.version;
   }
   const firmwareCurrent = versionIsUpToDate(firmwareVersion, latestFirmwareVersion);
   const bootloaderCurrent = versionIsUpToDate(bootloaderVersion, latestBootloaderVersion);
