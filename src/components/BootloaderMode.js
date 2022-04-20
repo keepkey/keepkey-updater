@@ -25,7 +25,7 @@ function renderWarning(props, state, setState, showCustom) {
         Click here if advised by customer support.
       </a></p>
       <p style={{ color: '#FFFFFF', marginTop: 60, textAlign: 'center' }}>
-        Keep seeing this screen? <a style={{ cursor: 'pointer' }} onClick={navigateToHelp}>Get Help</a>
+        Keep seeing this screen? <a style={{ cursor: 'pointer', marginLeft: '0.5em' }} onClick={navigateToHelp}>Get Help</a>
       </p>
     </div>
   )
@@ -45,8 +45,8 @@ function renderOptions(props, state, setState, showCustom) {
           <br />
           Unplug your KeepKey and plug it back in.
         </p>
-        <p style={{ justifySelf: 'flex-end' }}>
-          Confused? <a style={{ cursor: 'pointer' }} onClick={navigateToHelp}>Get Help</a>
+        <p style={{ color: '#FFFFFF', justifySelf: 'flex-end' }}>
+          Confused? <a style={{ cursor: 'pointer', marginLeft: '0.5em' }} onClick={navigateToHelp}>Get Help</a>
         </p>
     </div>
   )
