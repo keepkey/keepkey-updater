@@ -18,8 +18,7 @@
     "react-scripts": "^5.0.1",
     "semantic-ui-react": "^0.84.0",
     "semver-compare": "^1.0.0",
-    "usb": "^2.3.1",
-    "usb-detection": "~4.13.0"
+    "usb": "^2.3.1"
   },
   "build": {
     "appId": "KeepKeyUpdater",

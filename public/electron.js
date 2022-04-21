@@ -5,7 +5,7 @@ const ipcMain = electron.ipcMain;
 const BrowserWindow = electron.BrowserWindow;
 const path = require('path');
 const isDev = require('electron-is-dev');
-const usbDetect = require('usb-detection');
+const { WebUSB } = require('usb');
 const { NodeWebUSBKeepKeyAdapter } = require('@shapeshiftoss/hdwallet-keepkey-nodewebusb')
 const { HIDKeepKeyAdapter } = require('@shapeshiftoss/hdwallet-keepkey-nodehid')
 const { Keyring } = require('@shapeshiftoss/hdwallet-core')
@@ -33,7 +33,7 @@ const FIRMWARE_MANIFEST_URL = (() => {
 
 let mainWindow;
 
-usbDetect.startMonitoring();
+const webusb = new WebUSB({ allowAllDevices: true })
 
 // =======================================================================================
 // talking to KeepKey
@@ -211,36 +211,33 @@ const getBinary = async (path) => {
 // =======================================================================================
 // usb dis/connect listeners
 
-usbDetect.on('add:11044:1', async function(device) {
-  mainWindow.webContents.send('connecting', true)
-  const wallet = await createHidWallet()
-  const features = wallet ? wallet.features : null
-  mainWindow.webContents.send('features', await normalizeFeatures(features))
-  mainWindow.webContents.send('connecting', false)
-});
+webusb.addEventListener("connect", async (ev) => {
+  try {
+    const device = ev.device
+    if (device.vendorId !== 0x2b24) return
+    if (![0x0001, 0x0002].includes(device.productId)) return
+    mainWindow.webContents.send('connecting', true)
+    const wallet = (device.productId === 0x0001 ? await createHidWallet() : await createWebUsbWallet());
+    const features = wallet ? wallet.features : null
+    mainWindow.webContents.send('features', await normalizeFeatures(features))
+    mainWindow.webContents.send('connecting', false)
+  } catch (e) {
+    console.error("USB connection handler error", e)
+    mainWindow.webContents.send('update-status', 'FAILED');
+  }
+})
 
-usbDetect.on('remove:11044:1', async function(device) {
-  const wallet = Object.values(keyring.wallets)[0]
-  if (!!wallet) wallet.transport.disconnect()
-  await keyring.removeAll()
-  mainWindow.webContents.send('features', null);
-  mainWindow.webContents.send('connecting', false);
-});
-
-usbDetect.on('add:11044:2', async function(device) {
-  mainWindow.webContents.send('connecting', true)
-  const wallet = await createWebUsbWallet()
-  const features = wallet ? wallet.features : null
-  mainWindow.webContents.send('features', await normalizeFeatures(features))
-  mainWindow.webContents.send('connecting', false)
-});
-
-usbDetect.on('remove:11044:2', async function(device) {
-  const wallet = Object.values(keyring.wallets)[0]
-  if (!!wallet) wallet.transport.disconnect()
-  await keyring.removeAll()
-  mainWindow.webContents.send('features', null)
-  mainWindow.webContents.send('connecting', false)
+webusb.addEventListener("disconnect", async (ev) => {
+  try {
+    const wallet = Object.values(keyring.wallets)[0]
+    if (!!wallet) wallet.transport.disconnect()
+    await keyring.removeAll()
+    mainWindow.webContents.send('features', null);
+    mainWindow.webContents.send('connecting', false);
+  } catch (e) {
+    console.error("USB disconnection handler error", e)
+    mainWindow.webContents.send('update-status', 'FAILED');
+  }
 });
 
 // =======================================================================================
@@ -251,8 +248,12 @@ electron.ipcMain.on('app-start', async (event, arg) => {
     mainWindow.webContents.send('app-version', `v${app.getVersion()}`);
     const [ firmwareData ] = await Promise.all([getFirmwareData(), getFirmwareBinary(), getBlupdaterBinary()])
     mainWindow.webContents.send('firmware-data', firmwareData);
-    let connectedDeviceProductId
-    await usbDetect.find(0x2b24, function(err, foundDevices) { connectedDeviceProductId = foundDevices.length ? foundDevices[0].productId : null })
+    const connectedDeviceProductId = await webusb.requestDevice({
+      filters: [
+        { vendorId: 0x2b24, productId: 0x0001 },
+        { vendorId: 0x2b24, productId: 0x0002 },
+      ]
+    }).then(x => x.productId, () => null)
     let features, wallet
     switch (connectedDeviceProductId) {
       case 1:
@@ -415,7 +416,6 @@ async function createWindow() {
 app.on('ready', createWindow);
 
 app.on('before-quit', () => {
-  usbDetect.stopMonitoring();
   ipcMain.removeAllListeners('app-start');
   ipcMain.removeAllListeners('update-firmware');
   ipcMain.removeAllListeners('update-bootloader');
