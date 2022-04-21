@@ -277,8 +277,8 @@ electron.ipcMain.on('app-start', async (event, arg) => {
 });
 
 electron.ipcMain.on('update-required', async (event, updateRequired) => {
-  if (updateRequired.bootloader && !blupdaterBinary) await getBlupdaterBinary().catch(() => undefined)
-  if (updateRequired.firmware && !firmwareBinary) await getFirmwareBinary().catch(() => undefined)
+  if (updateRequired.bootloader) await getBlupdaterBinary().catch(() => undefined)
+  if (updateRequired.firmware) await getFirmwareBinary().catch(() => undefined)
 })
 
 electron.ipcMain.on('wipe-keepkey', async (event, updateRequired) => {
