@@ -16,7 +16,7 @@ export default class BootloaderUpdated extends Component {
     if(!features) return null
     const reconnectInBootloaderMode = !prevProps.features
       && features.bootloaderMode
-      && firmwareData?.latest?.bootloader?.version === features.bootloaderVersion
+      && firmwareData?.latest?.bootloader?.version === features?.bootloaderVersion
     if(reconnectInBootloaderMode && !this.state.readyForFirmwareUpdate) {
       this.setState({ readyForFirmwareUpdate: true })
       this.props.updateTitleBar({ title: 'Bootloader Updated', progress: 100 })
@@ -32,7 +32,7 @@ export default class BootloaderUpdated extends Component {
 
   render() {
     if (this.state.readyForFirmwareUpdate) {
-      const { bootloaderVersion } = this.props.features
+      const { bootloaderVersion } = this.props.features ?? {}
       return(
         <div>
           <h1>Bootloader Updated</h1>

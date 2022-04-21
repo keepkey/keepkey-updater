@@ -13,7 +13,7 @@ export default class AxiomUpdate extends Component {
     this.state = {
       updateState: 'initial',
       updateStatus: null,
-      deviceIsInitialized: props.features && props.features.initialized,
+      deviceIsInitialized: props.features?.initialized,
     }
     this.transitionState = this.transitionState.bind(this);
     this.handleNewUpdateStatus = this.handleNewUpdateStatus.bind(this);
