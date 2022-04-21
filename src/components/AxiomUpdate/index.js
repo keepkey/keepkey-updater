@@ -82,21 +82,27 @@ export default class AxiomUpdate extends Component {
         const initialProps = { ...shared, setDeviceIsInitialized: this.setDeviceIsInitialized }
         return <Initial { ...initialProps } />;
       case 'updatingBootloader':
+      case 'bootloaderUploading':
         return <BootloaderUpdating
           deviceIsInitialized={deviceIsInitialized}
           updateTitleBar={updateTitleBar}
+          uploading={updateState === 'bootloaderUploading'}
           updateBootloader={this.updateBootloader} />;
       case 'bootloaderUpdated':
         return <BootloaderUpdated { ...shared } />;
       case 'updatingFirmware':
+      case 'firmwareUploading':
         return <FirmwareUpdating
           deviceIsInitialized={deviceIsInitialized}
           updateTitleBar={updateTitleBar}
+          uploading={updateState === 'firmwareUploading'}
           updateFirmware={this.updateFirmware} />
       case 'updatingCustom':
+      case 'customUploading':
         return <FirmwareUpdating
           deviceIsInitialized={deviceIsInitialized}
           updateTitleBar={updateTitleBar}
+          uploading={updateState === 'customUploading'}
           updateFirmware={this.updateCustom} />
       case 'customUpdated':
       case 'firmwareUpdated':
@@ -127,6 +133,10 @@ const updateMachine = {
     UPDATE_CUSTOM: 'updatingCustom',
   },
   updatingBootloader: {
+    UPLOAD_IN_PROGRESS: 'bootloaderUploading',
+    FAILED: 'failure',
+  },
+  bootloaderUploading: {
     BOOTLOADER_UPDATE_SUCCESS: 'bootloaderUpdated',
     FAILED: 'failure',
   },
@@ -134,6 +144,10 @@ const updateMachine = {
     UPDATE_FIRMWARE: 'updatingFirmware'
   },
   updatingFirmware: {
+    UPLOAD_IN_PROGRESS: 'firmwareUploading',
+    FAILED: 'failure',
+  },
+  firmwareUploading: {
     FIRMWARE_UPDATE_SUCCESS: 'firmwareUpdated',
     FAILED: 'failure',
   },
@@ -141,6 +155,10 @@ const updateMachine = {
     UPDATE_COMPLETE: 'updateComplete', // skip to complete as we are not updating policies
   },
   updatingCustom: {
+    UPLOAD_IN_PROGRESS: 'customUploading',
+    FAILED: 'failure',
+  },
+  customUploading: {
     CUSTOM_UPDATE_SUCCESS: 'customUpdated',
     FAILED: 'failure',
   },

@@ -1,5 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import HoldAndRelease from '../../images/hold-and-release.svg';
+import KeepKeyOutline from '../../images/keepkey-outline.svg';
 
 export default class BootloaderUpdating extends Component {
   componentDidMount() {
@@ -32,7 +33,7 @@ export default class BootloaderUpdating extends Component {
         }
         <p style={warningStyles}>DO NOT UNPLUG</p>
         <img
-          src={HoldAndRelease}
+          src={this.props.uploading ? KeepKeyOutline : HoldAndRelease}
           style={holdAndReleaseStyles}
           alt="hold button"
         />
