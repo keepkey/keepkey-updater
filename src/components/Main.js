@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import semverCmp from 'semver-compare'
+
 import NoDevice from './NoDevice';
 import Device from './Device';
 import Loading from './Loading';
@@ -6,6 +8,16 @@ import AxiomUpdate from './AxiomUpdate';
 import FoxLogo from '../images/fox-logo.svg';
 
 const { ipcRenderer } = window.require('electron');
+
+const versionIsUpToDate = (current, target) => {
+  current = current.replace(/^v/, "");
+  target = target.replace(/^v/, "");
+  try {
+    return semverCmp(current, target) !== -1;
+  } catch (e) {
+    return false;
+  }
+};
 
 const appHeaderStyles = {
   textAlign: 'center',
@@ -30,8 +42,7 @@ const appVersionStyles = {
   position: 'absolute',
   right: 0,
   bottom: 0,
-  padding: '5px 10px',
-  opacity: '40%',
+  padding: '5px 10px'
 }
 
 export default class Main extends Component {
@@ -56,6 +67,7 @@ export default class Main extends Component {
     this.handleError = this.handleError.bind(this);
     this.updateTitleBar = this.updateTitleBar.bind(this);
     this.handleAppVersion = this.handleAppVersion.bind(this);
+    this.updateUpdater = this.updateUpdater.bind(this);
   }
 
   updateFeatures(event, message) {
@@ -100,6 +112,11 @@ export default class Main extends Component {
   contactSupport = (e) => {
     e.preventDefault();
     ipcRenderer.send('get-help')
+  }
+
+  updateUpdater = (e) => {
+    e.preventDefault();
+    ipcRenderer.send('update-updater')
   }
 
   progressBar() {
@@ -169,6 +186,8 @@ export default class Main extends Component {
       );
     }
 
+    const updaterUpdateAvailable = appVersion && firmwareData?.latest?.updater?.version && !versionIsUpToDate(appVersion, firmwareData.latest.updater.version)
+
     return (
       <div>
         <div style={appHeaderStyles}>
@@ -190,8 +209,17 @@ export default class Main extends Component {
             firmwareData={firmwareData}
             connecting={connecting}
           />
-          }
-        { !!appVersion && <div style={appVersionStyles}>{appVersion}</div> }
+        }
+        { !!appVersion &&
+          <div style={appVersionStyles}>
+            <span style={{ opacity: 0.4 }}>{appVersion}</span>
+            {updaterUpdateAvailable &&
+              <span style={{ marginLeft: '0.5em' }}>
+                (<a style={{ cursor: 'pointer' }} onClick={this.updateUpdater}>{ firmwareData?.strings?.updateUpdater || "Update Available" }</a>)
+              </span>
+            }
+          </div>
+        }
       </div>
     );
   }

@@ -385,6 +385,14 @@ electron.ipcMain.on('get-help', async (event, arg) => {
   if (link && link.startsWith('https://')) await electron.shell.openExternal(link)
 });
 
+electron.ipcMain.on('update-updater', async (event, arg) => {
+  const link = (await getFirmwareData().catch(() => undefined))?.links?.updater
+  if (link && link.startsWith('https://')) {
+    await electron.shell.openExternal(link)
+    await closeApp()
+  }
+});
+
 // =======================================================================================
 // app creation
 
