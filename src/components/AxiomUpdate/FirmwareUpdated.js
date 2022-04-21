@@ -18,7 +18,7 @@ export default class FirmwareUpdated extends Component {
     return(
       <Fragment>
         <h2 style={{ fontSize: '29px', fontWeight: 400, color: '#ffffff' }}>Almost done</h2>
-        <span>If your KeepKey does not automatically reboot within the next few seconds, unplug it and plug it back in.</span>
+        <p style={{ margin: '1.5em 0' }}>If your KeepKey does not automatically reboot within the next few seconds, unplug it and plug it back in.</p>
         <img style={ConnectKeepKeyStyles} src={ConnectKeepKey} alt="device outline" />
       </Fragment>
       );
