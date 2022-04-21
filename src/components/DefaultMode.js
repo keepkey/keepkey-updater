@@ -89,7 +89,7 @@ export default ({ features, initiateUpdate, firmwareData, connecting, updateTitl
       }
       </div>
       <div style={{ display: 'flex', justifyContent: 'center' }}>
-        <Button warn onClick={forgotPin} style={{ fontWeight: 200, fontSize: '9px' }}>
+        <Button onClick={forgotPin} style={{ fontWeight: 200, fontSize: '9px' }}>
           Forgot Pin?
         </Button>
       </div>
