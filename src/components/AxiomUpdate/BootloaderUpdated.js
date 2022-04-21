@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import Updatable from '../Updatable';
-import ConnectKeepKey from '../../images/connect-keepkey.svg';
+import KeepKeyStatic from '../../images/keepkey-static.svg';
 
 const stripV = (version) => version.replace(/v/g, '')
 
@@ -57,8 +57,8 @@ export default class BootloaderUpdated extends Component {
     return(
       <Fragment>
         <h2 style={{ fontSize: '29px', fontWeight: 400, color: '#ffffff' }}>Updating Bootloader</h2>
-        <span style={{ margin: '1.5em 0' }}>If your KeepKey does not automatically reboot within the next few seconds, unplug it and plug it back in to start the update process. The device will automatically reboot once the update is complete.</span>
-        <img style={ConnectKeepKeyStyles} src={ConnectKeepKey} alt="device outline" />
+        <p style={{ margin: '1.5em 0' }}>If the update process does not start automatically within the next few seconds, unplug your KeepKey and plug it back in.</p>
+        <img style={ConnectKeepKeyStyles} src={KeepKeyStatic} alt="device outline" />
       </Fragment>
     );
   }
