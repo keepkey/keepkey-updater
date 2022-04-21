@@ -1,7 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import Updatable from '../Updatable';
 import ConnectKeepKey from '../../images/connect-keepkey.svg';
-import HoldAndConnect from '../../images/hold-and-connect.svg';
 
 const stripV = (version) => version.replace(/v/g, '')
 
@@ -57,45 +56,17 @@ export default class BootloaderUpdated extends Component {
     }
     return(
       <Fragment>
-        <h2 style={{ fontSize: '29px', fontWeight: 400, color: '#ffffff' }}>Ready to Update Bootloader</h2>
-        <span>If your KeepKey does not automatically reboot within the next few seconds, unplug it and plug it back in.</span>
+        <h2 style={{ fontSize: '29px', fontWeight: 400, color: '#ffffff' }}>Updating Bootloader</h2>
+        <span style={{ margin: '1.5em 0' }}>If your KeepKey does not automatically reboot within the next few seconds, unplug it and plug it back in to start the update process. The device will automatically reboot once the update is complete.</span>
         <img style={ConnectKeepKeyStyles} src={ConnectKeepKey} alt="device outline" />
       </Fragment>
     );
   }
 }
 
-const stepAndImageContainerStyles = {
-  position: 'relative',
-  overflow: 'hidden'
-}
-
-const stepContainerStyles = {
-  display: 'flex'
-};
-
-const stepTextStyles = {
-  flex: 6,
-  fontSize: '12px',
-  textAlign: 'left'
-};
-
-const stepNumberStyles = {
-  flex: 1,
-  fontWeight: 'bold',
-  fontSize: '22px'
-};
-
-const connectImageStyles = {
+const ConnectKeepKeyStyles = {
   position: 'absolute',
-  width: 175,
-  bottom: -30,
-  left: 'calc(50% - 95px)'
-};
-
-const connectAndHoldImageStyles = {
-  position: 'absolute',
-  width: 204,
-  bottom: -22,
-  left: 'calc(50% - 110px)'
+  width: 292,
+  bottom: -25,
+  left: 'calc(50% - 155px)'
 };
