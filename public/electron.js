@@ -151,6 +151,7 @@ const setTempFirmware = async () => {
   } catch (err) {
     console.log({ err })
     mainWindow.webContents.send('error', 'ERROR FETCHING FIRMWARE');
+    throw err
   }
 }
 
@@ -166,6 +167,7 @@ const setTempBlupdater = async () => {
   } catch (err) {
     console.log({ err })
     mainWindow.webContents.send('error', 'ERROR FETCHING BOOTLOADER');
+    throw err
   }
 }
 
@@ -255,8 +257,8 @@ electron.ipcMain.on('app-start', async (event, arg) => {
 });
 
 electron.ipcMain.on('update-required', async (event, updateRequired) => {
-  if (updateRequired.bootloader && !blupdaterBinary) await setTempBlupdater()
-  if (updateRequired.firmware && !firmwareBinary) await setTempFirmware()
+  if (updateRequired.bootloader && !blupdaterBinary) await setTempBlupdater().catch()
+  if (updateRequired.firmware && !firmwareBinary) await setTempFirmware().catch()
 })
 
 electron.ipcMain.on('wipe-keepkey', async (event, updateRequired) => {
