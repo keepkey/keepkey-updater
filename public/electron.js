@@ -65,7 +65,7 @@ const normalizeFeatures = async (features) => {
   const { bootloaderHash, firmwareHash } = features
   const decodedBootloaderHash = bootloaderHash && base64toHEX(bootloaderHash)
   const decodedFirmwareHash = firmwareHash && base64toHEX(firmwareHash)
-  const hashes = (await getFirmwareData().catch(x => ({}))).hashes
+  const hashes = (await getFirmwareData().catch(() => undefined)).hashes
   return {
     ...features,
     firmwareVersion: hashes?.firmware?.[decodedFirmwareHash] ?? "Unknown",
@@ -133,45 +133,60 @@ const wipeDevice = async () => {
 // =======================================================================================
 // talking to S3 Bucket
 
-let firmwareDataPromise, firmwareBinary, blupdaterBinary
+let firmwareDataPromise, firmwareBinaryPromise, blupdaterBinaryPromise
 
 const getFirmwareData = async () => {
   if (!firmwareDataPromise) {
     firmwareDataPromise = fetch(FIRMWARE_MANIFEST_URL).then(x => x.json())
+    firmwareDataPromise.then(() => console.log('firmware data loaded'))
   }
   return await firmwareDataPromise
 }
 
-const setTempFirmware = async () => {
-  try {
-    const fwData = await getFirmwareData()
-    const path = fwData.latest.firmware.url
-    const hash = fwData.latest.firmware.hash
-    firmwareBinary = await getBinary(path)
-    if (hash && crypto.createHash("sha256").update(firmwareBinary).digest().toString("hex") !== hash) {
-      throw new Error("hash mismatch");
-    }
-  } catch (err) {
-    console.log({ err })
-    mainWindow.webContents.send('error', 'ERROR FETCHING FIRMWARE');
-    throw err
+const getFirmwareBinary = async () => {
+  if (!firmwareBinaryPromise) {
+    firmwareBinaryPromise = (async () => {
+      try {
+        const fwData = await getFirmwareData()
+        const path = fwData.latest.firmware.url
+        const hash = fwData.latest.firmware.hash
+        const firmwareBinary = await getBinary(path)
+        if (hash && crypto.createHash("sha256").update(firmwareBinary).digest().toString("hex") !== hash) {
+          throw new Error("hash mismatch");
+        }
+        return firmwareBinary
+      } catch (err) {
+        console.log({ err })
+        mainWindow.webContents.send('error', 'ERROR FETCHING FIRMWARE');
+        throw err
+      }
+    })();
+    firmwareBinaryPromise.then(() => console.log('firmware binary loaded'))
   }
+  return await firmwareBinaryPromise
 }
 
-const setTempBlupdater = async () => {
-  try {
-    const fwData = await getFirmwareData()
-    const path = fwData.latest.bootloader.url
-    const hash = fwData.latest.bootloader.hash
-    blupdaterBinary = await getBinary(path)
-    if (hash && crypto.createHash("sha256").update(blupdaterBinary).digest().toString("hex") !== hash) {
-      throw new Error("hash mismatch");
-    }
-  } catch (err) {
-    console.log({ err })
-    mainWindow.webContents.send('error', 'ERROR FETCHING BOOTLOADER');
-    throw err
+const getBlupdaterBinary = async () => {
+  if (!blupdaterBinaryPromise) {
+    blupdaterBinaryPromise = (async () => {
+      try {
+        const fwData = await getFirmwareData()
+        const path = fwData.latest.bootloader.url
+        const hash = fwData.latest.bootloader.hash
+        const blupdaterBinary = await getBinary(path)
+        if (hash && crypto.createHash("sha256").update(blupdaterBinary).digest().toString("hex") !== hash) {
+          throw new Error("hash mismatch");
+        }
+        return blupdaterBinary
+      } catch (err) {
+        console.log({ err })
+        mainWindow.webContents.send('error', 'ERROR FETCHING BOOTLOADER');
+        throw err
+      }
+    })()
+    blupdaterBinaryPromise.then(() => console.log('blupdater binary loaded'))
   }
+  return await blupdaterBinaryPromise
 }
 
 const firmwareIsValid = (buf) => {
@@ -234,7 +249,8 @@ usbDetect.on('remove:11044:2', async function(device) {
 electron.ipcMain.on('app-start', async (event, arg) => {
   try {
     mainWindow.webContents.send('app-version', `v${app.getVersion()}`);
-    mainWindow.webContents.send('firmware-data', await getFirmwareData());
+    const [ firmwareData ] = await Promise.all([getFirmwareData(), getFirmwareBinary(), getBlupdaterBinary()])
+    mainWindow.webContents.send('firmware-data', firmwareData);
     let connectedDeviceProductId
     await usbDetect.find(0x2b24, function(err, foundDevices) { connectedDeviceProductId = foundDevices.length ? foundDevices[0].productId : null })
     let features, wallet
@@ -260,8 +276,8 @@ electron.ipcMain.on('app-start', async (event, arg) => {
 });
 
 electron.ipcMain.on('update-required', async (event, updateRequired) => {
-  if (updateRequired.bootloader && !blupdaterBinary) await setTempBlupdater().catch()
-  if (updateRequired.firmware && !firmwareBinary) await setTempFirmware().catch()
+  if (updateRequired.bootloader && !blupdaterBinary) await getBlupdaterBinary().catch(() => undefined)
+  if (updateRequired.firmware && !firmwareBinary) await getFirmwareBinary().catch(() => undefined)
 })
 
 electron.ipcMain.on('wipe-keepkey', async (event, updateRequired) => {
@@ -292,7 +308,7 @@ electron.ipcMain.on('wipe-keepkey', async (event, updateRequired) => {
 
 electron.ipcMain.on('update-firmware', async (event, arg) => {
   try {
-    if(!firmwareBinary) await setTempFirmware()
+    const firmwareBinary = await getFirmwareBinary()
     const updateResponse = await uploadToDevice(firmwareBinary)
     if(updateResponse) {
       mainWindow.webContents.send('update-status', 'FIRMWARE_UPDATE_SUCCESS');
@@ -307,7 +323,7 @@ electron.ipcMain.on('update-firmware', async (event, arg) => {
 
 electron.ipcMain.on('update-bootloader', async (event, arg) => {
   try {
-    if(!blupdaterBinary) await setTempBlupdater()
+    const blupdaterBinary = await getBlupdaterBinary()
     const updateResponse = await uploadToDevice(blupdaterBinary)
     if(updateResponse) {
       mainWindow.webContents.send('update-status', 'BOOTLOADER_UPDATE_SUCCESS');
@@ -364,7 +380,7 @@ electron.ipcMain.on('go-to-app', async (event, arg) => {
 });
 
 electron.ipcMain.on('get-help', async (event, arg) => {
-  const link = (await getFirmwareData())?.links?.support ?? DEFAULT_SUPPORT_LINK
+  const link = (await getFirmwareData().catch(() => undefined))?.links?.support ?? DEFAULT_SUPPORT_LINK
   if (link && link.startsWith('https://')) await electron.shell.openExternal(link)
 });
 
