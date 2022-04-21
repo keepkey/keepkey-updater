@@ -7,6 +7,7 @@
 !/.nvmrc
 !/assets/
 !/assets/**
+!/deploy_ipns.sh
 !/infra/
 !/infra/**
 !/package.json
