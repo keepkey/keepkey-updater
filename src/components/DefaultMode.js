@@ -84,6 +84,7 @@ export default ({ features, initiateUpdate, firmwareData, connecting, updateTitl
       <div style={{ display: 'flex', justifyContent: 'center' }}>
       { !updateRequired &&
           <Button primary onClick={goToApp} style={{ fontWeight: 400, fontSize: '18px', marginBottom: '15px' }}>
+            {firmwareData?.strings?.goToApp ?? "Done"}
           </Button>
       }
       </div>

@@ -13,6 +13,9 @@ const url = require('url')
 const crypto = require('crypto')
 const fetch = require('./node-fetch-file-url');
 
+const DEFAULT_MANIFEST_URL = 'https://static.shapeshift.com/firmware/releases.json';
+const DEFAULT_SUPPORT_LINK = 'https://shapeshift.zendesk.com';
+
 const normalizeManifestUrl = (x) => {
   try {
     return new URL(x);
@@ -25,7 +28,7 @@ const normalizeManifestUrl = (x) => {
 const FIRMWARE_MANIFEST_URL = (() => {
   if (process.argv[1] === "--manifest") return normalizeManifestUrl(process.argv[2]);
   if (process.env.KEEPKEY_FIRMWARE_MANIFEST) return normalizeManifestUrl(process.env.KEEPKEY_FIRMWARE_MANIFEST);
-  return new URL("https://static.shapeshift.com/firmware/releases.json");
+  return new URL(DEFAULT_MANIFEST_URL);
 })()
 
 let mainWindow;
@@ -355,11 +358,14 @@ electron.ipcMain.on('close-application', async (event, arg) => {
 });
 
 electron.ipcMain.on('go-to-app', async (event, arg) => {
+  const link = (await getFirmwareData())?.links?.app
+  if (link && link.startsWith('https://')) await electron.shell.openExternal(link)
   await closeApp()
 });
 
 electron.ipcMain.on('get-help', async (event, arg) => {
-  await electron.shell.openExternal('https://shapeshift.zendesk.com')
+  const link = (await getFirmwareData())?.links?.support ?? DEFAULT_SUPPORT_LINK
+  if (link && link.startsWith('https://')) await electron.shell.openExternal(link)
 });
 
 // =======================================================================================
