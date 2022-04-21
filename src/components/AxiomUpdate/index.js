@@ -59,7 +59,7 @@ export default class AxiomUpdate extends Component {
   renderUnknownError() {
     return(
       <div>
-        <span>Something went wrong. Please unplug your KeepKey, restart KeepKey Updater, and try again.</span>
+        <p style={{ margin: "8em 0" }}>Something went wrong. Please unplug your KeepKey, restart KeepKey Updater, and try again.</p>
       </div>
     )
   }

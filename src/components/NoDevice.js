@@ -6,10 +6,10 @@ const NoDevice = ({ updateTitleBar }) => {
   return(
     <div style={noDeviceStyles}>
       <h1 style={{ color: '#ffffff' }}>No Device Connected</h1>
-      <span style={{ fontSize: '15px' }}>
+      <p style={{ margin: '1.5em 0', fontSize: '15px' }}>
         If your KeepKey is connected, make sure that it's not being used by
         another app or website, and then try unplugging it and plugging it back in.
-      </span>
+      </p>
       <img style={ConnectKeepKeyStyles} src={ConnectKeepKey} alt="device outline" />
     </div>
   );
