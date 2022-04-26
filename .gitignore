@@ -8,6 +8,8 @@
 !/assets/
 !/assets/**
 !/deploy_ipns.sh
+!/firmware/
+!/firmware/**
 !/infra/
 !/infra/**
 !/package.json
