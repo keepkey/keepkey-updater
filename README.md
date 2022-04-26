@@ -1,11 +1,13 @@
 # KeepKey Updater
 
-## Setup
-install deps and run:
+## Just want to update your KeepKey's firmware?
+
+Download the latest release build for your platform from the [releases](https://github.com/shapeshift/keepkey-updater/releases) page and run it.
+
+## Development
 
 ```
-yarn
-yarn electron-dev
+yarn && yarn electron-dev
 ```
 
 Changes to the display process (the things in `src/`) will automatically trigger a reload. Changes
@@ -68,6 +70,6 @@ openssl dgst -sha256 -binary bootloader.bin | openssl dgst -sha256 -r | cut -d '
 
 3) Commit changes to `releases.json`, plus new binary image files in a subdirectory of `firmware`.
 
-4) Run `firmware/ipns-deploy.sh`, providing an IPNS keyfile and a web3.storage API key.
+4) Run `deploy_ipns.sh`, providing the path to an IPNS keyfile and a [web3.storage](https://web3.storage) API key as parameters.
 
 5) Done.
