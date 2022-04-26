@@ -1,11 +1,23 @@
 import React, { Component } from 'react';
+import semverCmp from 'semver-compare'
+
 import NoDevice from './NoDevice';
 import Device from './Device';
 import Loading from './Loading';
 import AxiomUpdate from './AxiomUpdate';
 import FoxLogo from '../images/fox-logo.svg';
 
-const { shell, ipcRenderer } = window.require('electron');
+const { ipcRenderer } = window.require('electron');
+
+const versionIsUpToDate = (current, target) => {
+  current = current.replace(/^v/, "");
+  target = target.replace(/^v/, "");
+  try {
+    return semverCmp(current, target) !== -1;
+  } catch (e) {
+    return false;
+  }
+};
 
 const appHeaderStyles = {
   textAlign: 'center',
@@ -22,7 +34,15 @@ const appTitleStyles = {
 const imageStyles = {
   display: 'block',
   margin: 'auto',
-  marginTop: 20
+  marginTop: 15
+}
+
+const appVersionStyles = {
+  display: 'block',
+  position: 'absolute',
+  right: 0,
+  bottom: 0,
+  padding: '5px 10px'
 }
 
 export default class Main extends Component {
@@ -33,18 +53,21 @@ export default class Main extends Component {
       features: null,
       updating: false,
       start: null,
-      latest: null,
+      firmwareData: null,
       error: null,
       title: 'KeepKey Updater',
       progress: 0,
+      appVersion: null,
     }
     this.updateFeatures = this.updateFeatures.bind(this);
     this.updateConnecting = this.updateConnecting.bind(this);
     this.initiateUpdate = this.initiateUpdate.bind(this);
     this.uncaughtException = this.uncaughtException.bind(this);
-    this.handleLatest = this.handleLatest.bind(this);
+    this.handleFirmwareData = this.handleFirmwareData.bind(this);
     this.handleError = this.handleError.bind(this);
     this.updateTitleBar = this.updateTitleBar.bind(this);
+    this.handleAppVersion = this.handleAppVersion.bind(this);
+    this.updateUpdater = this.updateUpdater.bind(this);
   }
 
   updateFeatures(event, message) {
@@ -55,8 +78,12 @@ export default class Main extends Component {
     this.setState({ connecting: message });
   }
 
-  handleLatest(event, message) {
-    this.setState({ latest: message })
+  handleFirmwareData(event, message) {
+    this.setState({ firmwareData: message })
+  }
+
+  handleAppVersion(event, message) {
+    this.setState({ appVersion: message })
   }
 
   updateTitleBar(update) {
@@ -84,8 +111,12 @@ export default class Main extends Component {
 
   contactSupport = (e) => {
     e.preventDefault();
-    const url = 'https://shapeshift.zendesk.com'
-    shell.openExternal(url);
+    ipcRenderer.send('get-help')
+  }
+
+  updateUpdater = (e) => {
+    e.preventDefault();
+    ipcRenderer.send('update-updater')
   }
 
   progressBar() {
@@ -107,8 +138,9 @@ export default class Main extends Component {
     ipcRenderer.on('features', this.updateFeatures);
     ipcRenderer.on('connecting', this.updateConnecting);
     ipcRenderer.on('uncaught-exception', this.uncaughtException);
-    ipcRenderer.on('latest', this.handleLatest);
+    ipcRenderer.on('firmware-data', this.handleFirmwareData);
     ipcRenderer.on('error', this.handleError);
+    ipcRenderer.on('app-version', this.handleAppVersion);
   }
 
   componentWillUnmount() {
@@ -117,7 +149,7 @@ export default class Main extends Component {
   }
 
   render() {
-    const { error, features, connecting, updating, start, latest, title } = this.state;
+    const { error, features, connecting, updating, start, firmwareData, title, appVersion } = this.state;
 
     if(updating) {
       return(
@@ -131,18 +163,18 @@ export default class Main extends Component {
             updateTitleBar={this.updateTitleBar}
             start={start}
             features={features}
-            latest={latest}
+            firmwareData={firmwareData}
             cancel={() => this.setState({ updating: false, title: 'KeepKey Updater', progress: 0 })}
           />
         </div>
       );
     }
 
-    if(!!error) {
+    if(!!error && !(features && features.bootloaderMode)) {
       return(
         <div style={{textAlign: 'center', marginTop: 100, fontWeight: 600}}>
           <p>
-            Something went wrong when trying to fetch data from ShapeShift.
+            Something went wrong when trying to fetch firmware data.
             Please check your internet connnection and try again.
           </p>
           <p>{ error }</p>
@@ -154,6 +186,8 @@ export default class Main extends Component {
       );
     }
 
+    const updaterUpdateAvailable = appVersion && firmwareData?.latest?.updater?.version && !versionIsUpToDate(appVersion, firmwareData.latest.updater.version)
+
     return (
       <div>
         <div style={appHeaderStyles}>
@@ -161,24 +195,32 @@ export default class Main extends Component {
           { this.progressBar() }
         </div>
         <img style={imageStyles} src={FoxLogo} alt="fox" />
-        { (connecting || !latest) &&
-          <Loading>{!latest ? 'Fetching Firmware Data' : 'Getting Device Info'}</Loading>
-          }
+        { (connecting || !firmwareData) &&
+          <Loading>{!firmwareData ? 'Fetching Firmware Data' : 'Getting Device Info'}</Loading>
+        }
         { (!connecting && !features) &&
           <NoDevice updateTitleBar={this.updateTitleBar} />
-          }
-        { (!!features && !!latest) &&
+        }
+        { (!!features && !!firmwareData) &&
           <Device
             initiateUpdate={this.initiateUpdate}
             updateTitleBar={this.updateTitleBar}
             features={features}
-            latest={latest}
+            firmwareData={firmwareData}
             connecting={connecting}
           />
-          }
+        }
+        { !!appVersion &&
+          <div style={appVersionStyles}>
+            <span style={{ opacity: 0.4 }}>{appVersion}</span>
+            {updaterUpdateAvailable &&
+              <span style={{ marginLeft: '0.5em' }}>
+                (<a style={{ cursor: 'pointer' }} onClick={this.updateUpdater}>{ firmwareData?.strings?.updateUpdater || "Update Available" }</a>)
+              </span>
+            }
+          </div>
+        }
       </div>
     );
   }
 }
-
-

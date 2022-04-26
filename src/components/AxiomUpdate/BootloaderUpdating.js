@@ -1,5 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import HoldAndRelease from '../../images/hold-and-release.svg';
+import KeepKeyOutline from '../../images/keepkey-outline.svg';
 
 export default class BootloaderUpdating extends Component {
   componentDidMount() {
@@ -22,7 +23,7 @@ export default class BootloaderUpdating extends Component {
           <Fragment>
             <p>
               Since this is a new device, ignore the statement on the KeepKey screen
-              that says "Verify Backup" (You'll get a recovery sentence later)
+              that says "Verify Backup". (You'll get a recovery sentence later.)
             </p>
             <p>
               Just hold down the button on your KeepKey until the device displays
@@ -32,7 +33,7 @@ export default class BootloaderUpdating extends Component {
         }
         <p style={warningStyles}>DO NOT UNPLUG</p>
         <img
-          src={HoldAndRelease}
+          src={this.props.uploading ? KeepKeyOutline : HoldAndRelease}
           style={holdAndReleaseStyles}
           alt="hold button"
         />

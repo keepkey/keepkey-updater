@@ -1,20 +1,31 @@
 import React, { Fragment } from 'react';
 import Updatable from './Updatable';
 import { Button } from 'semantic-ui-react'
+import semverCmp from 'semver-compare'
 
-const { shell, ipcRenderer } = window.require('electron');
+const { ipcRenderer } = window.require('electron');
 
 const stripV = (version) => version.replace(/v/g, '')
 
-export default ({ features, initiateUpdate, latest, connecting, updateTitleBar })  => {
+const versionIsUpToDate = (current, target) => {
+  current = current.replace(/^v/, "");
+  target = target.replace(/^v/, "");
+  try {
+    return semverCmp(current, target) !== -1;
+  } catch (e) {
+    return false;
+  }
+};
+
+export default ({ features, initiateUpdate, firmwareData, connecting, updateTitleBar })  => {
   const { firmwareVersion, bootloaderVersion } = features;
   let latestFirmwareVersion, latestBootloaderVersion;
-  if (latest) {
-    latestFirmwareVersion = latest.firmware.version;
-    latestBootloaderVersion = latest.bootloader.version;
+  if (firmwareData?.latest) {
+    latestFirmwareVersion = firmwareData?.latest.firmware.version;
+    latestBootloaderVersion = firmwareData?.latest.bootloader.version;
   }
-  const firmwareCurrent = firmwareVersion === latestFirmwareVersion;
-  const bootloaderCurrent = bootloaderVersion === latestBootloaderVersion;
+  const firmwareCurrent = versionIsUpToDate(firmwareVersion, latestFirmwareVersion);
+  const bootloaderCurrent = versionIsUpToDate(bootloaderVersion, latestBootloaderVersion);
   const updateRequired = !(bootloaderCurrent && firmwareCurrent);
 
   if(updateRequired && !connecting) {
@@ -25,11 +36,9 @@ export default ({ features, initiateUpdate, latest, connecting, updateTitleBar }
     ipcRenderer.send('update-required', requiredUpdates);
   }
 
-  const goToShapeshift = (e) => {
+  const goToApp = (e) => {
     e.preventDefault();
-    const url = 'https://beta.shapeshift.com';
-    shell.openExternal(url);
-    ipcRenderer.send('close-application')
+    ipcRenderer.send('go-to-app')
   }
 
   const forgotPin = (e) => {
@@ -74,13 +83,13 @@ export default ({ features, initiateUpdate, latest, connecting, updateTitleBar }
       </div>
       <div style={{ display: 'flex', justifyContent: 'center' }}>
       { !updateRequired &&
-          <Button primary onClick={goToShapeshift} style={{ fontWeight: 400, fontSize: '18px' }}>
-            Head over to ShapeShift!
+          <Button primary onClick={goToApp} style={{ fontWeight: 400, fontSize: '18px', marginBottom: '15px' }}>
+            {firmwareData?.strings?.goToApp || "Exit"}
           </Button>
       }
       </div>
       <div style={{ display: 'flex', justifyContent: 'center' }}>
-        <Button warn onClick={forgotPin} style={{ fontWeight: 200, fontSize: '9px' }}>
+        <Button onClick={forgotPin} style={{ fontWeight: 200, fontSize: '9px' }}>
           Forgot Pin?
         </Button>
       </div>

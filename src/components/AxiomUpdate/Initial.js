@@ -2,7 +2,7 @@ import React, { Component, Fragment } from 'react';
 import { Button } from 'semantic-ui-react';
 import HoldAndConnect from '../../images/hold-and-connect.svg';
 
-const { shell } = window.require('electron');
+const { ipcRenderer } = window.require('electron');
 
 export default class Initial extends Component {
   constructor(props) {
@@ -22,6 +22,9 @@ export default class Initial extends Component {
     if(approved && bootloaderMode) {
       transitionState(start)
     }
+    if (!(!this.state.initializedConfirmed) && !(deviceIsInitialized && !backupConfirmed) && !bootloaderMode) {
+      this.props.updateTitleBar({ progress: 25 })
+    }
     return null;
   }
 
@@ -32,19 +35,24 @@ export default class Initial extends Component {
 
   navigateToAssistance(e) {
     e.preventDefault()
-    const url = 'https://shapeshift.zendesk.com/hc/en-us/categories/360001062760-Beta'
-    shell.openExternal(url);
+    ipcRenderer.send('get-help')
   }
 
   render() {
-    const { features, cancel, deviceIsInitialized } = this.props;
+    const { cancel, deviceIsInitialized, features, firmwareData, start } = this.props;
     const { backupConfirmed, initializedConfirmed } = this.state;
 
     if(!initializedConfirmed) {
       return(
         <div style={{ textAlign: 'center', fontSize: '15px' }}>
           <h1 style={{ color: '#FFFFFF' }}>Start Update</h1>
-          <div>Please select an option:</div>
+          <div style={{ margin: '1.5em 0' }}>{
+            start === "UPDATE_BOOTLOADER" && firmwareData?.latest?.bootloader?.version && firmwareData?.latest?.firmware?.version ?
+            `Your KeepKey will be updated twice; first to bootloader ${firmwareData.latest.bootloader.version}, and then to firmware ${firmwareData.latest.firmware.version}.` :
+            start === "UPDATE_FIRMWARE" && firmwareData?.latest?.firmware?.version ?
+            `Your KeepKey will be updated to firmware ${firmwareData.latest.firmware.version}.` :
+            'Please select an option:'
+          }</div>
           <div style={buttonsContainerStyles}>
             <Button
               primary
@@ -55,20 +63,25 @@ export default class Initial extends Component {
               onClick={() => this.handleSetInitialized(true)}
             >I'VE SET UP THIS KEEPKEY BEFORE</Button>
           </div>
+          <div style={warningLinksStyles}>
+            <div style={{margin: '1.5em 0'}}>
+              <a style={{ cursor: 'pointer' }} onClick={cancel}>CANCEL UPDATE</a>
+            </div>
+          </div>
         </div>
       )
     }
 
     if(deviceIsInitialized && !backupConfirmed) {
       return(
-        <div style={{ textAlign: 'left', fontSize: '15px' }}>
+        <div style={{ textAlign: 'left', fontSize: '14px' }}>
           <h1 style={{ textAlign: 'center', color: '#FFFFFF' }}>Before You Proceed</h1>
-          <div>Only continue if you have your recovery sentence.</div>
-          <div>
+          <div style={{ margin: '1em 0' }}>Only continue if you have your recovery sentence.</div>
+          <div style={{ margin: '1em 0' }}>
             In the unlikely event that something goes wrong, you might not be able to access
             your funds without your recovery sentence.
           </div>
-          <div style={{ display: 'flex', justifyContent: 'center', padding: '15px 5px' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', padding: '0 5px 15px 5px' }}>
             <Button
               primary
               style={{ width: '100%' }}
@@ -87,7 +100,6 @@ export default class Initial extends Component {
     const bootloaderMode = features && features.bootloader_mode;
 
     if(!bootloaderMode) {
-      this.props.updateTitleBar({ progress: 25 })
       return(
         <Fragment>
           <h2 style={{ fontSize: '29px', fontWeight: 400, color: '#ffffff' }}>Ready to Update</h2>
@@ -123,6 +135,6 @@ const warningLinksStyles = {
   flexDirection: 'column',
   justifyContent: 'space-between',
   alignItems: 'center',
-  height: 75,
+  height: 67,
   fontWeight: 600
 }

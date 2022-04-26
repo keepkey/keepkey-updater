@@ -1,18 +1,11 @@
 import React, { Component, Fragment } from 'react';
 import HoldAndRelease from '../../images/hold-and-release.svg';
-
-const { shell } = window.require('electron');
+import KeepKeyOutline from '../../images/keepkey-outline.svg';
 
 export default class FirmwareUpdating extends Component {
   componentDidMount() {
     setTimeout(this.props.updateFirmware, 300) // allow time for render before halting the process
     this.props.updateTitleBar({ title: 'Firmware Update', progress: 50 })
-  }
-
-  openHelpArticle(e) {
-    e.preventDefault()
-    const url = 'https://beta.shapeshift.com'
-    shell.openExternal(url)
   }
 
   render() {
@@ -30,7 +23,7 @@ export default class FirmwareUpdating extends Component {
           <Fragment>
             <p>
               Since this is a new device, ignore the statement on the KeepKey screen
-              that says "Verify Backup" (You'll get a recovery sentence later)
+              that says "Verify Backup". (You'll get a recovery sentence later.)
             </p>
             <p>
               Just hold down the button on your KeepKey until the device displays
@@ -40,7 +33,7 @@ export default class FirmwareUpdating extends Component {
         }
         <p style={warningStyles}>DO NOT UNPLUG</p>
         <img
-          src={HoldAndRelease}
+          src={this.props.uploading ? KeepKeyOutline : HoldAndRelease}
           style={holdAndReleaseStyles}
           alt="hold button"
         />

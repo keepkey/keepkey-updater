@@ -13,7 +13,7 @@ export default class AxiomUpdate extends Component {
     this.state = {
       updateState: 'initial',
       updateStatus: null,
-      deviceIsInitialized: props.features && props.features.initialized,
+      deviceIsInitialized: props.features?.initialized,
     }
     this.transitionState = this.transitionState.bind(this);
     this.handleNewUpdateStatus = this.handleNewUpdateStatus.bind(this);
@@ -48,6 +48,10 @@ export default class AxiomUpdate extends Component {
     ipcRenderer.send('update-firmware');
   }
 
+  updateCustom() {
+    ipcRenderer.send('update-custom');
+  }
+
   setDeviceIsInitialized(deviceIsInitialized) {
     this.setState({ deviceIsInitialized })
   }
@@ -55,39 +59,52 @@ export default class AxiomUpdate extends Component {
   renderUnknownError() {
     return(
       <div>
-        <span>Something went wrong. Please unplug your KeepKey, restart KeepKey Updater, and try again.</span>
+        <p style={{ margin: "8em 0" }}>Something went wrong. Please unplug your KeepKey, restart KeepKey Updater, and try again.</p>
       </div>
     )
   }
 
   renderUpdateStage() {
     const { updateState, deviceIsInitialized } = this.state;
-    const { features, start, cancel, updateTitleBar, latest } = this.props;
+    const { features, start, cancel, updateTitleBar, firmwareData } = this.props;
     const shared = {
       features,
       start,
       cancel,
-      latest,
+      firmwareData,
       updateTitleBar,
       deviceIsInitialized,
       transitionState: this.transitionState
     };
+    console.log(`updateState: ${updateState}`);
     switch(updateState) {
       case 'initial':
         const initialProps = { ...shared, setDeviceIsInitialized: this.setDeviceIsInitialized }
         return <Initial { ...initialProps } />;
       case 'updatingBootloader':
+      case 'bootloaderUploading':
         return <BootloaderUpdating
           deviceIsInitialized={deviceIsInitialized}
           updateTitleBar={updateTitleBar}
+          uploading={updateState === 'bootloaderUploading'}
           updateBootloader={this.updateBootloader} />;
       case 'bootloaderUpdated':
         return <BootloaderUpdated { ...shared } />;
       case 'updatingFirmware':
+      case 'firmwareUploading':
         return <FirmwareUpdating
           deviceIsInitialized={deviceIsInitialized}
           updateTitleBar={updateTitleBar}
+          uploading={updateState === 'firmwareUploading'}
           updateFirmware={this.updateFirmware} />
+      case 'updatingCustom':
+      case 'customUploading':
+        return <FirmwareUpdating
+          deviceIsInitialized={deviceIsInitialized}
+          updateTitleBar={updateTitleBar}
+          uploading={updateState === 'customUploading'}
+          updateFirmware={this.updateCustom} />
+      case 'customUpdated':
       case 'firmwareUpdated':
         return <FirmwareUpdated { ...shared } />;
       case 'updateComplete':
@@ -113,8 +130,13 @@ const updateMachine = {
   initial: {
     UPDATE_BOOTLOADER: 'updatingBootloader',
     UPDATE_FIRMWARE: 'updatingFirmware',
+    UPDATE_CUSTOM: 'updatingCustom',
   },
   updatingBootloader: {
+    UPLOAD_IN_PROGRESS: 'bootloaderUploading',
+    FAILED: 'failure',
+  },
+  bootloaderUploading: {
     BOOTLOADER_UPDATE_SUCCESS: 'bootloaderUpdated',
     FAILED: 'failure',
   },
@@ -122,10 +144,25 @@ const updateMachine = {
     UPDATE_FIRMWARE: 'updatingFirmware'
   },
   updatingFirmware: {
+    UPLOAD_IN_PROGRESS: 'firmwareUploading',
+    FAILED: 'failure',
+  },
+  firmwareUploading: {
     FIRMWARE_UPDATE_SUCCESS: 'firmwareUpdated',
     FAILED: 'failure',
   },
   firmwareUpdated: {
+    UPDATE_COMPLETE: 'updateComplete', // skip to complete as we are not updating policies
+  },
+  updatingCustom: {
+    UPLOAD_IN_PROGRESS: 'customUploading',
+    FAILED: 'failure',
+  },
+  customUploading: {
+    CUSTOM_UPDATE_SUCCESS: 'customUpdated',
+    FAILED: 'failure',
+  },
+  customUpdated: {
     UPDATE_COMPLETE: 'updateComplete', // skip to complete as we are not updating policies
   },
   failure: {

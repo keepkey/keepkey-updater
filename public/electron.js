@@ -1,45 +1,45 @@
 const electron = require('electron');
 const app = electron.app;
+const dialog = electron.dialog;
+const ipcMain = electron.ipcMain;
 const BrowserWindow = electron.BrowserWindow;
 const path = require('path');
-const url = require('url');
 const isDev = require('electron-is-dev');
-const usbDetect = require('usb-detection');
+const { WebUSB } = require('usb');
 const { NodeWebUSBKeepKeyAdapter } = require('@shapeshiftoss/hdwallet-keepkey-nodewebusb')
 const { HIDKeepKeyAdapter } = require('@shapeshiftoss/hdwallet-keepkey-nodehid')
 const { Keyring } = require('@shapeshiftoss/hdwallet-core')
-const request = require('request')
+const url = require('url')
+const crypto = require('crypto')
+const fetch = require('./node-fetch-file-url');
 
-const FIRMWARE_BASE_URL = "https://static.shapeshift.com/firmware/"
+const DEFAULT_MANIFEST_URL = 'https://ipfs.io/ipns/k51qzi5uqu5dlbggjzdpw8ya206zkcdmd1gmg77oqdmuhs899bgfv43lzhd5er/releases.json';
+const DEFAULT_SUPPORT_LINK = 'https://shapeshift.zendesk.com';
+
+const normalizeManifestUrl = (x) => {
+  try {
+    return new URL(x);
+  } catch {
+    if (process.env.PORTABLE_EXECUTABLE_DIR) x = path.resolve(process.env.PORTABLE_EXECUTABLE_DIR, x)
+    return url.pathToFileURL(x);
+  }
+}
+
+const FIRMWARE_MANIFEST_URL = (() => {
+  if (process.argv[1] === "--manifest") return normalizeManifestUrl(process.argv[2]);
+  if (process.env.KEEPKEY_FIRMWARE_MANIFEST) return normalizeManifestUrl(process.env.KEEPKEY_FIRMWARE_MANIFEST);
+  return new URL(DEFAULT_MANIFEST_URL);
+})()
 
 let mainWindow;
 
-usbDetect.startMonitoring();
+const webusb = new WebUSB({ allowAllDevices: true })
 
 // =======================================================================================
 // talking to KeepKey
 
 const keyring = new Keyring
 let webUsbAdapter, hidAdapter
-
-const bootloaderHashToVersion = {
-  '6397c446f6b9002a8b150bf4b9b4e0bb66800ed099b881ca49700139b0559f10': 'v1.0.0',
-  'f13ce228c0bb2bdbc56bdcb5f4569367f8e3011074ccc63331348deb498f2d8f': 'v1.0.0',
-  'd544b5e06b0c355d68b868ac7580e9bab2d224a1e2440881cc1bca2b816752d5': 'v1.0.1',
-  'ec618836f86423dbd3114c37d6e3e4ffdfb87d9e4c6199cf3e163a67b27498a2': 'v1.0.1',
-  'cd702b91028a2cfa55af43d3407ba0f6f752a4a2be0583a172983b303ab1032e': 'v1.0.2',
-  'bcafb38cd0fbd6e2bdbea89fb90235559fdda360765b74e4a8758b4eff2d4921': 'v1.0.2',
-  'cb222548a39ff6cbe2ae2f02c8d431c9ae0df850f814444911f521b95ab02f4c': 'v1.0.3',
-  '917d1952260c9b89f3a96bea07eea4074afdcc0e8cdd5d064e36868bdd68ba7d': 'v1.0.3',
-  '6465bc505586700a8111c4bf7db6f40af73e720f9e488d20db56135e5a690c4f': 'v1.0.3',
-  'db4bc389335e876e942ae3b12558cecd202b745903e79b34dd2c32532708860e': 'v1.0.3',
-  '2e38950143cf350345a6ddada4c0c4f21eb2ed337309f39c5dbc70b6c091ae00': 'v1.0.3',
-  '83d14cb6c7c48af2a83bc326353ee6b9abdd74cfe47ba567de1cb564da65e8e9': 'v1.0.3',
-  '770b30aaa0be884ee8621859f5d055437f894a5c9c7ca22635e7024e059857b7': 'v1.0.4',
-  'fc4e5c4dc2e5127b6814a3f69424c936f1dc241d1daf2c5a2d8f0728eb69d20d': 'v1.0.4',
-  'e45f587fb07533d832548402d0e71d8e8234881da54d86c4b699c28a6482b0ee': 'v1.1.0',
-  '9bf1580d1b21250f922b68794cdadd6c8e166ae5b15ce160a42f8c44a2f05936': 'v2.0.0',
-}
 
 const atob = str => Buffer.from(str, 'base64').toString('binary');
 
@@ -60,30 +60,17 @@ const sleep = (millis) => (new Promise((resolve, reject) => {
   setTimeout(resolve, millis)
 }))
 
-const normalizeWebUsbFeatures = (features) => {
+const normalizeFeatures = async (features) => {
   if (!features) return null
-  const { majorVersion, minorVersion, patchVersion, bootloaderHash } = features
-  const decodedHash = base64toHEX(bootloaderHash)
+  const { bootloaderHash, firmwareHash } = features
+  const decodedBootloaderHash = bootloaderHash && base64toHEX(bootloaderHash)
+  const decodedFirmwareHash = firmwareHash && base64toHEX(firmwareHash)
+  const hashes = (await getFirmwareData().catch(() => undefined)).hashes
   return {
     ...features,
-    firmwareVersion: `v${majorVersion}.${minorVersion}.${patchVersion}`,
-    bootloaderVersion: bootloaderHashToVersion[decodedHash]
+    firmwareVersion: hashes?.firmware?.[decodedFirmwareHash] ?? "Unknown",
+    bootloaderVersion: hashes?.bootloader?.[decodedBootloaderHash] ?? "Unknown"
   }
-}
-
-const normalizeHidFeatures = (features) => {
-  if (!features) return null
-  const { bootloaderHash, bootloaderMode } = features
-  const decodedHash = base64toHEX(bootloaderHash)
-  const normedFeatures = {
-    ...features,
-    bootloaderVersion: bootloaderHashToVersion[decodedHash]
-  }
-  if (!bootloaderMode) {
-    const { majorVersion, minorVersion, patchVersion, bootloaderHash } = features
-    normedFeatures.firmwareVersion = `v${majorVersion}.${minorVersion}.${patchVersion}`
-  }
-  return normedFeatures
 }
 
 const createWebUsbWallet = async (attempts = 0) => {
@@ -104,9 +91,7 @@ const createWebUsbWallet = async (attempts = 0) => {
 const createHidWallet = async (attempts = 0) => {
   try {
     hidAdapter = await HIDKeepKeyAdapter.useKeyring(keyring)
-    await hidAdapter.initialize()
-    const wallet = keyring.get()
-    if (!wallet) throw 'No wallet in the keyring'
+    const wallet = await hidAdapter.pairDevice()
     return wallet
   } catch (error) {
     if (attempts < 10) {
@@ -122,9 +107,11 @@ const uploadToDevice = async (binary) => {
   try {
     const wallet = Object.values(keyring.wallets)[0]
     if (!wallet) return null
+    if (!firmwareIsValid(binary)) throw new Error("firmware binary not valid");
     await wallet.firmwareErase()
-    const uploadResult = await wallet.firmwareUpload(binary)
-    return uploadResult
+    mainWindow.webContents.send("update-status", "UPLOAD_IN_PROGRESS")
+    await wallet.firmwareUpload(binary)
+    return true
   } catch (error) {
     console.log('error uploading to device: ', error)
     return false
@@ -138,7 +125,7 @@ const wipeDevice = async () => {
     const result = await wallet.wipe()
     return result
   } catch (error) {
-    console.log('error uploading to device: ', error)
+    console.log('error wiping device: ', error)
     return false
   }
 }
@@ -146,92 +133,111 @@ const wipeDevice = async () => {
 // =======================================================================================
 // talking to S3 Bucket
 
-let latestFirmwareData, firmwareBinary, blupdaterBinary
+let firmwareDataPromise, firmwareBinaryPromise, blupdaterBinaryPromise
 
-const getLatestFirmwareData = async () => {
-  return new Promise((resolve, reject) => {
-    request(`${FIRMWARE_BASE_URL}releases.json`, (err, response, body) => {
-      if(err) return reject(err)
-      resolve(JSON.parse(body).latest)
-    })
-  })
+const getFirmwareData = async () => {
+  if (!firmwareDataPromise) {
+    firmwareDataPromise = fetch(FIRMWARE_MANIFEST_URL).then(x => x.json())
+    firmwareDataPromise.then(() => console.log('firmware data loaded'))
+  }
+  return await firmwareDataPromise
 }
 
-const setTempFirmware = async () => {
-  if(!latestFirmwareData) return
-  const path = latestFirmwareData.firmware.url
-  try {
-    firmwareBinary = await getBinary(path)
-  } catch (err) {
-    console.log({ err })
-    mainWindow.webContents.send('error', 'ERROR FETCHING FIRMWARE');
+const getFirmwareBinary = async () => {
+  if (!firmwareBinaryPromise) {
+    firmwareBinaryPromise = (async () => {
+      try {
+        const fwData = await getFirmwareData()
+        const path = fwData.latest.firmware.url
+        const hash = fwData.latest.firmware.hash
+        const firmwareBinary = await getBinary(path)
+        if (hash && crypto.createHash("sha256").update(firmwareBinary).digest().toString("hex") !== hash) {
+          throw new Error("hash mismatch");
+        }
+        return firmwareBinary
+      } catch (err) {
+        console.log({ err })
+        mainWindow.webContents.send('error', 'ERROR FETCHING FIRMWARE');
+        throw err
+      }
+    })();
+    firmwareBinaryPromise.then(() => console.log('firmware binary loaded'))
   }
+  return await firmwareBinaryPromise
 }
 
-const setTempBlupdater = async () => {
-  if(!latestFirmwareData) return
-  const path = latestFirmwareData.bootloader.url
-  try {
-    blupdaterBinary = await getBinary(path)
-  } catch (err) {
-    console.log({ err })
-    mainWindow.webContents.send('error', 'ERROR FETCHING BOOTLOADER');
+const getBlupdaterBinary = async () => {
+  if (!blupdaterBinaryPromise) {
+    blupdaterBinaryPromise = (async () => {
+      try {
+        const fwData = await getFirmwareData()
+        const path = fwData.latest.bootloader.url
+        const hash = fwData.latest.bootloader.hash
+        const blupdaterBinary = await getBinary(path)
+        if (hash && crypto.createHash("sha256").update(blupdaterBinary).digest().toString("hex") !== hash) {
+          throw new Error("hash mismatch");
+        }
+        return blupdaterBinary
+      } catch (err) {
+        console.log({ err })
+        mainWindow.webContents.send('error', 'ERROR FETCHING BOOTLOADER');
+        throw err
+      }
+    })()
+    blupdaterBinaryPromise.then(() => console.log('blupdater binary loaded'))
   }
+  return await blupdaterBinaryPromise
+}
+
+const firmwareIsValid = (buf) => {
+  return !!buf
+  && buf.slice(0x0000, 0x0004).toString() === 'KPKY' // check for 'magic' bytes
+  && buf.slice(0x0004, 0x0008).readUInt32LE() === buf.length - 256 // check firmware length - metadata
+  && buf.slice(0x000B, 0x000C).readUInt8() & 0x01 // check that flag is not set to wipe device
 }
 
 const getBinary = async (path) => {
-  return new Promise((resolve, reject) => {
-    request({
-      url: FIRMWARE_BASE_URL + path,
-      headers: {
-        accept: 'application/octet-stream',
-      },
-      encoding: null
-    }, (err, response, body) => {
-      if(err) return reject(err)
-      if(response.statusCode !== 200) return reject('Unable to fetch latest firmware')
-      const firmwareIsValid = !!body
-        && body.slice(0x0000, 0x0004).toString() === 'KPKY' // check for 'magic' bytes
-        && body.slice(0x0004, 0x0008).readUInt32LE() === body.length - 256 // check firmware length - metadata
-        && body.slice(0x000B, 0x000C).readUInt8() & 0x01 // check that flag is not set to wipe device
-      if(!firmwareIsValid) return reject('Fetched data is not valid firmware')
-      resolve(body)
-    })
+  const res = await fetch(new URL(path, FIRMWARE_MANIFEST_URL), {
+    headers: {
+      accept: 'application/octet-stream'
+    }
   })
+  if (!res.ok) throw new Error('Unable to fetch latest firmware')
+  const body = Buffer.from(await res.arrayBuffer())
+  if(!firmwareIsValid(body)) throw new Error('Fetched data is not valid firmware')
+  return body
 }
 
 // =======================================================================================
 // usb dis/connect listeners
 
-usbDetect.on('add:11044:1', async function(device) {
-  mainWindow.webContents.send('connecting', true)
-  const wallet = await createHidWallet()
-  const features = wallet ? wallet.features : null
-  mainWindow.webContents.send('features', normalizeHidFeatures(features))
-  mainWindow.webContents.send('connecting', false)
-});
+webusb.addEventListener("connect", async (ev) => {
+  try {
+    const device = ev.device
+    if (device.vendorId !== 0x2b24) return
+    if (![0x0001, 0x0002].includes(device.productId)) return
+    mainWindow.webContents.send('connecting', true)
+    const wallet = (device.productId === 0x0001 ? await createHidWallet() : await createWebUsbWallet());
+    const features = wallet ? wallet.features : null
+    mainWindow.webContents.send('features', await normalizeFeatures(features))
+    mainWindow.webContents.send('connecting', false)
+  } catch (e) {
+    console.error("USB connection handler error", e)
+    mainWindow.webContents.send('update-status', 'FAILED');
+  }
+})
 
-usbDetect.on('remove:11044:1', function(device) {
-  keyring.removeAll()
-  mainWindow.webContents.send('features', null);
-  mainWindow.webContents.send('connecting', false);
-});
-
-usbDetect.on('add:11044:2', async function(device) {
-  mainWindow.webContents.send('connecting', true)
-  const wallet = await createWebUsbWallet()
-  mainWindow.webContents.send('connecting', false)
-  const features = wallet ? wallet.features : null
-  mainWindow.webContents.send('features', normalizeWebUsbFeatures(features))
-});
-
-usbDetect.on('remove:11044:2', async function(device) {
-  const wallet = Object.values(keyring.wallets)[0]
-  if (!!wallet) wallet.transport.disconnect()
-  await keyring.removeAll()
-  webUsbAdapter.clearDevices()
-  mainWindow.webContents.send('features', null)
-  mainWindow.webContents.send('connecting', false)
+webusb.addEventListener("disconnect", async (ev) => {
+  try {
+    const wallet = Object.values(keyring.wallets)[0]
+    if (!!wallet) wallet.transport.disconnect()
+    await keyring.removeAll()
+    mainWindow.webContents.send('features', null);
+    mainWindow.webContents.send('connecting', false);
+  } catch (e) {
+    console.error("USB disconnection handler error", e)
+    mainWindow.webContents.send('update-status', 'FAILED');
+  }
 });
 
 // =======================================================================================
@@ -239,19 +245,24 @@ usbDetect.on('remove:11044:2', async function(device) {
 
 electron.ipcMain.on('app-start', async (event, arg) => {
   try {
-    latestFirmwareData = await getLatestFirmwareData();
-    mainWindow.webContents.send('latest', latestFirmwareData);
-    let connectedDeviceProductId
-    await usbDetect.find(0x2b24, function(err, foundDevices) { connectedDeviceProductId = foundDevices.length ? foundDevices[0].productId : null })
+    mainWindow.webContents.send('app-version', `v${app.getVersion()}`);
+    const [ firmwareData ] = await Promise.all([getFirmwareData(), getFirmwareBinary(), getBlupdaterBinary()])
+    mainWindow.webContents.send('firmware-data', firmwareData);
+    const connectedDeviceProductId = await webusb.requestDevice({
+      filters: [
+        { vendorId: 0x2b24, productId: 0x0001 },
+        { vendorId: 0x2b24, productId: 0x0002 },
+      ]
+    }).then(x => x.productId, () => null)
     let features, wallet
     switch (connectedDeviceProductId) {
       case 1:
         wallet = await createHidWallet()
-        features = wallet ? normalizeHidFeatures(wallet.features) : null
+        features = wallet ? await normalizeFeatures(wallet.features) : null
         break
       case 2:
         wallet = await createWebUsbWallet()
-        features = wallet ? normalizeWebUsbFeatures(wallet.features) : null
+        features = wallet ? await normalizeFeatures(wallet.features) : null
         break
       default:
         features = null
@@ -260,13 +271,14 @@ electron.ipcMain.on('app-start', async (event, arg) => {
   } catch (error) {
     console.log('failed to fetch firmware info or binaries: ', error)
     mainWindow.webContents.send('error', 'ERROR FETCHING RELEASE DATA');
+    mainWindow.webContents.send('firmware-data', {});
   }
   mainWindow.webContents.send('connecting', false)
 });
 
 electron.ipcMain.on('update-required', async (event, updateRequired) => {
-  if (updateRequired.bootloader && !blupdaterBinary) await setTempBlupdater()
-  if (updateRequired.firmware && !firmwareBinary) await setTempFirmware()
+  if (updateRequired.bootloader) await getBlupdaterBinary().catch(() => undefined)
+  if (updateRequired.firmware) await getFirmwareBinary().catch(() => undefined)
 })
 
 electron.ipcMain.on('wipe-keepkey', async (event, updateRequired) => {
@@ -275,17 +287,20 @@ electron.ipcMain.on('wipe-keepkey', async (event, updateRequired) => {
       type: 'question',
       buttons: ['cancel', 'wipe device'],
       defaultId: 2,
-      title: 'Question',
-      message: 'To reset your device\'s pin, you must wipe and continue.',
+      title: 'Reset Device',
+      message: 'To remove your PIN, you must reset your device to factory settings.',
       detail: 'This will WIPE your device!',
       checkboxLabel: 'I have my recovery phrase',
-      checkboxChecked: true,
+      checkboxChecked: false,
     };
-    electron.dialog.showMessageBox(null, options, (response, checkboxChecked) => {
-      if(response === 1 && checkboxChecked){
-        wipeDevice()
+    const msgBoxResp = await electron.dialog.showMessageBox(null, options)
+    if (msgBoxResp.response === 1){
+      if (msgBoxResp.checkboxChecked) {
+        await wipeDevice()
+      } else {
+        electron.dialog.showErrorBox('Reset Device', 'Confirm that you have your recovery phrase available before wiping your device.')
       }
-    });
+    }
   } catch(err) {
     console.error('failed to wipe device: ', err);
     mainWindow.webContents.send('update-status', 'FAILED');
@@ -294,45 +309,87 @@ electron.ipcMain.on('wipe-keepkey', async (event, updateRequired) => {
 
 electron.ipcMain.on('update-firmware', async (event, arg) => {
   try {
-    if(!firmwareBinary) await setTempFirmware()
+    const firmwareBinary = await getFirmwareBinary()
     const updateResponse = await uploadToDevice(firmwareBinary)
     if(updateResponse) {
       mainWindow.webContents.send('update-status', 'FIRMWARE_UPDATE_SUCCESS');
     } else {
-      mainWindow.webContents.send('update-status', 'FIRMWARE_UPDATE_SUCCESS');
-      // mainWindow.webContents.send('update-status', 'FAILED');
+      mainWindow.webContents.send('update-status', 'FAILED');
     }
   } catch(err) {
-    console.log('failed to upload binary to device: ', err);
+    console.error('failed to upload firmware to device: ', err);
     mainWindow.webContents.send('update-status', 'FAILED');
   }
 });
 
 electron.ipcMain.on('update-bootloader', async (event, arg) => {
   try {
-    if(!blupdaterBinary) await setTempBlupdater()
+    const blupdaterBinary = await getBlupdaterBinary()
     const updateResponse = await uploadToDevice(blupdaterBinary)
     if(updateResponse) {
       mainWindow.webContents.send('update-status', 'BOOTLOADER_UPDATE_SUCCESS');
     } else {
-      // mainWindow.webContents.send('update-status', 'FAILED');
-      mainWindow.webContents.send('update-status', 'BOOTLOADER_UPDATE_SUCCESS');
+      mainWindow.webContents.send('update-status', 'FAILED');
     }
-  } catch(err) {
+  } catch (err) {
+    console.error('failed to upload bootloader to device: ', err);
     mainWindow.webContents.send('update-status', 'FAILED');
   }
 });
 
+electron.ipcMain.on('update-custom', async (event, arg) => {
+  try {
+    const { filePaths: customBinaryPaths } = await dialog.showOpenDialog({
+      filters: [{ name: "Firmware Images", extensions: ["bin"] }],
+      properties: ["openFile", "dontAddToRecent"],
+    });
+    const customBinaryPath = customBinaryPaths[0];
+    if (!customBinaryPath) throw new Error("no file selected");
+    const customBinary = Buffer.from(await (await fetch(url.pathToFileURL(customBinaryPath))).arrayBuffer());
+    if (!firmwareIsValid(customBinary)) throw new Error("the selected file is not a valid firmware image");
+    const updateResponse = await uploadToDevice(customBinary)
+    if (updateResponse) {
+      mainWindow.webContents.send('update-status', 'CUSTOM_UPDATE_SUCCESS');
+    } else {
+      mainWindow.webContents.send('update-status', 'FAILED');
+    }
+  } catch (err) {
+    console.error('failed to upload custom binary to device: ', err);
+    mainWindow.webContents.send('update-status', 'FAILED');
+  }
+});
 
-electron.ipcMain.on('close-application', async (event, arg) => {
+const closeApp = async () => {
   try {
     const wallet = Object.values(keyring.wallets)[0]
     if (!!wallet) wallet.transport.disconnect()
     await keyring.removeAll()
-    webUsbAdapter.clearDevices()
     app.quit()
   } catch(err) {
     console.log('Error closing application: ', err)
+  }
+}
+
+electron.ipcMain.on('close-application', async (event, arg) => {
+  await closeApp()
+});
+
+electron.ipcMain.on('go-to-app', async (event, arg) => {
+  const link = (await getFirmwareData())?.links?.app
+  if (link && link.startsWith('https://')) await electron.shell.openExternal(link)
+  await closeApp()
+});
+
+electron.ipcMain.on('get-help', async (event, arg) => {
+  const link = (await getFirmwareData().catch(() => undefined))?.links?.support ?? DEFAULT_SUPPORT_LINK
+  if (link && link.startsWith('https://')) await electron.shell.openExternal(link)
+});
+
+electron.ipcMain.on('update-updater', async (event, arg) => {
+  const link = (await getFirmwareData().catch(() => undefined))?.links?.updater
+  if (link && link.startsWith('https://')) {
+    await electron.shell.openExternal(link)
+    await closeApp()
   }
 });
 
@@ -340,27 +397,41 @@ electron.ipcMain.on('close-application', async (event, arg) => {
 // app creation
 
 async function createWindow() {
-  mainWindow = new BrowserWindow({ width: 407, height: 525, title: '', resizable: isDev });
-  mainWindow.loadURL(isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, '../build/index.html')}`);
+  if (!isDev) electron.Menu.setApplicationMenu(electron.Menu.buildFromTemplate([]));
+  mainWindow = new BrowserWindow({
+    width: 407,
+    height: 525,
+    title: 'KeepKey Updater',
+    resizable: isDev,
+    autoHideMenuBar: true,
+    show: false,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+      enableRemoteModule: false,
+      webSecurity: true,
+    },
+  });
+  if (!isDev) {
+    mainWindow.removeMenu();
+  }
+  const bundledIndexPath = `file://${path.join(__dirname, '../build/index.html')}`;
   mainWindow.on('closed', () => mainWindow = null);
+  mainWindow.on('ready-to-show', () => mainWindow.show());
+  await mainWindow.loadURL(isDev ? 'http://localhost:3000' : bundledIndexPath).catch(() => mainWindow.loadURL(bundledIndexPath));
 }
 
 app.on('ready', createWindow);
 
 app.on('before-quit', () => {
-  usbDetect.stopMonitoring();
-  webUsbAdapter.clearDevices()
-  const { ipcMain } = electron;
   ipcMain.removeAllListeners('app-start');
   ipcMain.removeAllListeners('update-firmware');
   ipcMain.removeAllListeners('update-bootloader');
-  ipcMain.removeAllListeners('set-policy');
+  ipcMain.removeAllListeners('update-custom');
 });
 
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
+  app.quit();
 });
 
 app.on('activate', () => {

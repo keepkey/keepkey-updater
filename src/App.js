@@ -15,8 +15,8 @@ const appStyles= {
   backgroundSize: 'cover',
   height: '100vh',
   overflow: 'hidden',
-  padding: '0px 40px',
+  padding: '0px 29px',
   position: 'relative',
-  color: '#8798AD'
+  color: '#8798AD',
+  userSelect: 'none'
 };
-

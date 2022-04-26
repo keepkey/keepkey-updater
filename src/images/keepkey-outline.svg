@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="337px" height="196px" viewBox="0 0 337 196" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 54.1 (76490) - https://sketchapp.com -->
+    <title>Artboard</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Artboard" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="KeepKey_button_update-(1)" transform="translate(19.000000, 26.000000)" stroke="#FFFFFF">
+            <g id="keepkey" transform="translate(0.000000, 32.000000)">
+                <g id="el_XGiFipI_4-_1_">
+                    <path d="M277.6,119.9 L3,119.9 C1.4,119.9 0.1,118.6 0.1,117 L0.1,3.6 C0.1,2 1.4,0.7 3,0.7 L277.6,0.7 C279.2,0.7 280.5,2 280.5,3.6 L280.5,117 C280.5,118.6 279.2,119.9 277.6,119.9" id="el_Bqg2Kc3wvJ_1_"></path>
+                    <path d="M19.9,28.4 L260.8,28.4 C261.7,28.4 262.5,29.1 262.5,30.1 L262.5,88 C262.5,88.9 261.8,89.7 260.8,89.7 L19.9,89.7 C19,89.7 18.2,89 18.2,88 L18.2,30.1 C18.3,29.2 19,28.4 19.9,28.4 Z" id="el_QOEyJzgVgp_1_"></path>
+                </g>
+            </g>
+            <g id="button" transform="translate(236.000000, 25.000000)">
+                <g id="el_kRkkSiYguD">
+                    <path d="M19.9,0.7 L2.4,0.7 C1.5,0.7 0.8,1.2 0.8,1.8 L0.8,6.7 C0.8,7.3 1.5,7.8 2.4,7.8 L19.9,7.8 C20.8,7.8 21.5,7.3 21.5,6.7 L21.5,1.8 C21.5,1.2 20.8,0.7 19.9,0.7" id="el_6ycOCa0QSa"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
