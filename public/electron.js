@@ -13,7 +13,8 @@ const url = require('url')
 const crypto = require('crypto')
 const fetch = require('./node-fetch-file-url');
 
-const DEFAULT_MANIFEST_URL = 'https://ipfs.io/ipns/k51qzi5uqu5dlbggjzdpw8ya206zkcdmd1gmg77oqdmuhs899bgfv43lzhd5er/releases.json';
+//const DEFAULT_MANIFEST_URL = 'https://ipfs.io/ipns/k51qzi5uqu5dlbggjzdpw8ya206zkcdmd1gmg77oqdmuhs899bgfv43lzhd5er/releases.json';
+const DEFAULT_MANIFEST_URL = 'https://static.shapeshift.com/firmware/releases.json';
 const DEFAULT_SUPPORT_LINK = 'https://shapeshift.zendesk.com';
 
 const normalizeManifestUrl = (x) => {
