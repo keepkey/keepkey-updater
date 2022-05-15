@@ -56,7 +56,8 @@
       "target": [
         "AppImage"
       ]
-    }
+    },
+    "afterSign": "./scripts/afterSignHook.js"
   },
   "scripts": {
     "start": "react-scripts start",
