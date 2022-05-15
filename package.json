@@ -5,12 +5,17 @@
   "main": "public/electron.js",
   "author": "KeepKey",
   "homepage": "./",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/keepkey/keepkey-updater"
+  },
   "dependencies": {
     "@shapeshiftoss/hdwallet-core": "1.20.1",
     "@shapeshiftoss/hdwallet-keepkey-nodehid": "1.20.1",
     "@shapeshiftoss/hdwallet-keepkey-nodewebusb": "1.20.1",
     "electron-is-dev": "^2.0.0",
     "electron-notarize": "^1.0.1",
+    "electron-updater": "^5.0.1",
     "node-fetch": "^2.6.7",
     "node-hid": "^2.1.1",
     "react": "^16.8.6",
@@ -36,11 +41,23 @@
       "hardenedRuntime": true,
       "gatekeeperAssess": false,
       "entitlements": "assets/build/entitlements.mac.plist",
-      "entitlementsInherit": "assets/build/entitlements.mac.plist"
+      "entitlementsInherit": "assets/build/entitlements.mac.plist",
+      "target": [
+        "dmg"
+      ]
     },
     "win": {
       "icon": "build/icon.png",
-      "target": "portable"
+      "target": "nsis",
+      "publish": [
+        "github"
+      ]
+    },
+    "linux": {
+      "icon": "icons/icon.png",
+      "target": [
+        "AppImage"
+      ]
     }
   },
   "scripts": {

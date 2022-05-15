@@ -12,6 +12,7 @@ const { Keyring } = require('@shapeshiftoss/hdwallet-core')
 const url = require('url')
 const crypto = require('crypto')
 const fetch = require('./node-fetch-file-url');
+const { autoUpdater } = require("electron-updater")
 
 // const DEFAULT_MANIFEST_URL = 'https://ipfs.io/ipns/k51qzi5uqu5dlbggjzdpw8ya206zkcdmd1gmg77oqdmuhs899bgfv43lzhd5er/releases.json';
 const DEFAULT_MANIFEST_URL = 'https://raw.githack.com/keepkey/keepkey-updater/master/firmware/releases.json';
@@ -420,6 +421,7 @@ async function createWindow() {
   mainWindow.on('closed', () => mainWindow = null);
   mainWindow.on('ready-to-show', () => mainWindow.show());
   await mainWindow.loadURL(isDev ? 'http://localhost:3000' : bundledIndexPath).catch(() => mainWindow.loadURL(bundledIndexPath));
+  autoUpdater.checkForUpdatesAndNotify();
 }
 
 app.on('ready', createWindow);
