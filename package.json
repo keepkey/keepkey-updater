@@ -5,6 +5,7 @@
   "main": "public/electron.js",
   "author": "KeepKey",
   "homepage": "./",
+  "email": "support@keepkey.com",
   "repository": {
     "url": "https://github.com/keepkey/keepkey-updater"
   },
