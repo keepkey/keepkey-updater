@@ -26,27 +26,17 @@ jobs:
             ${{ runner.os }}-modules-${{ hashFiles('yarn.lock') }}
       - name: Install deps
         run: yarn install --frozen-lockfile
-      - name: Save env vars
-        run: echo "${{ secrets.DOTENV_VARS }}" >> .env
-      - name: Save sentry properties
-        run: echo "${{ secrets.SENTRY_PROPERTIES }}" >> sentry.properties
-      - name: Prepare for app notarization
-        if: startsWith(matrix.os, 'macos')
-        # Import Apple API key for app notarization on macOS
-        run: |
-          mkdir -p ~/private_keys/
-          echo '${{ secrets.api_key }}' > ~/private_keys/AuthKey_${{ secrets.api_key_id }}.p8
-      - name: Build/release Electron app
-        uses: samuelmeuli/action-electron-builder@v1
-        with:
-          mac_certs: ${{ secrets.mac_certs }}
-          mac_certs_password: ${{ secrets.mac_certs_password }}
-          # windows_certs: ${{ secrets.windows_certs }}
-          # windows_certs_password: ${{ secrets.windows_certs_password }}
-          github_token: ${{ secrets.github_token }}
-          build_script_name: electron-pack
-          release: true
+      - name: Build
+        if: "!startsWith(matrix.os, 'macos')"
+        run: yarn electron-pack
         env:
-          # macOS notarization API key
-          API_KEY_ID: ${{ secrets.api_key_id }}
-          API_KEY_ISSUER_ID: ${{ secrets.api_key_issuer_id }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build for Mac OS
+        if: startsWith(matrix.os, 'macos')
+        run: yarn electron-pack
+        env:
+          CSC_LINK: ${{ secrets.CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+          APPLEID: ${{ secrets.APPLEID }}
+          APPLEIDPW: ${{ secrets.APPLEIDPW }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
