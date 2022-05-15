@@ -1,12 +1,12 @@
 {
   "name": "keepkey-updater",
-  "version": "2.1.2",
+  "version": "2.1.4",
   "private": true,
   "main": "public/electron.js",
   "author": "KeepKey",
   "homepage": "./",
+  "email": "support@keepkey.com",
   "repository": {
-    "type": "git",
     "url": "https://github.com/keepkey/keepkey-updater"
   },
   "dependencies": {
@@ -54,7 +54,7 @@
       ]
     },
     "linux": {
-      "icon": "icons/icon.png",
+      "icon": "build/icon.png",
       "target": [
         "AppImage"
       ]
