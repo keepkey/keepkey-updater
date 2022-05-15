@@ -5,7 +5,7 @@ on: workflow_dispatch
 jobs:
   release:
     runs-on: ${{ matrix.os }}
-
+    environment: release
     strategy:
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
@@ -26,17 +26,21 @@ jobs:
             ${{ runner.os }}-modules-${{ hashFiles('yarn.lock') }}
       - name: Install deps
         run: yarn install --frozen-lockfile
-      - name: Build
+      - name: Build (non-Mac)
         if: "!startsWith(matrix.os, 'macos')"
         run: yarn electron-pack
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build for Mac OS
+      - name: Build (Mac)
         if: startsWith(matrix.os, 'macos')
-        run: yarn electron-pack
+        run: |
+          mkdir -p ~/.private_keys
+          printf '%s' '${{ secrets.APPLE_API_KEY }}' > ~/.private_keys/AuthKey_${{ secrets.APPLE_API_KEY_ID }}.p8
+          yarn electron-pack
         env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CSC_LINK: ${{ secrets.CSC_LINK }}
           CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
-          APPLEID: ${{ secrets.APPLEID }}
-          APPLEIDPW: ${{ secrets.APPLEIDPW }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          APPLE_API_KEY: ~/.private_keys/AuthKey_${{ secrets.APPLE_API_KEY_ID }}.p8
+          APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+          APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}

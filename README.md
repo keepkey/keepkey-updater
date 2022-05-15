@@ -23,11 +23,16 @@ There are three versions of the updater: Mac OS, Linux, and Windows. You must bu
 
 The `macos` build requires that the app be signed. As of 10.14.5, the app must also be notarized by Apple. The build process will do this automatically but you must configure the build machine with the following:
 
-	1. A Developer ID signing certificate must be added to the key store. This is typically done by signing into your developer account via the Xcode GUI.
+	1. A Developer ID signing certificate. This is typically done by signing into your developer account via the Xcode GUI, but you can also provide it via environment variables:
+
+                export CSC_LINK="$(base64 <path to PKCS #12 certificate>)"
+                export CSC_KEY_PASSWORD="<password to the p12 file above>"
+
 	2. You must set the following environment variables where XXXXX is the your developer ID and YYYYY is an app-specific password.
 
-		export APPLEID="XXXXX"
-		export APPLEIDPW= "YYYYY"
+		export APPLE_API_KEY="<path to a file containing the App Store Connect API key, a PKCS #8 private key in base64 between -----BEGIN PRIVATE KEY----- and -----END PRIVATE KEY----- lines>"
+		export APPLE_API_KEY_ID="<App Store Connect API key ID, 10-char uppercase alphanumeric>"
+                export APPLE_API_ISSUER="<App Store Connect Issuer ID, looks like a GUID>"
 
 #### Windows
 
