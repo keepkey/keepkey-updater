@@ -44,6 +44,13 @@
     "win": {
       "icon": "build/icon.png",
       "target": "portable"
+    },
+    "linux": {
+      "icon": "build/icon.png",
+      "target": [
+        "deb",
+        "AppImage"
+      ]
     }
   },
   "scripts": {
