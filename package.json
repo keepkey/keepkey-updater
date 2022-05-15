@@ -5,6 +5,9 @@
   "main": "public/electron.js",
   "author": "KeepKey",
   "homepage": "./",
+  "repository": {
+    "url": "https://github.com/keepkey/keepkey-updater"
+  },
   "dependencies": {
     "@shapeshiftoss/hdwallet-core": "1.20.1",
     "@shapeshiftoss/hdwallet-keepkey-nodehid": "1.20.1",
