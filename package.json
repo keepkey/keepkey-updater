@@ -49,10 +49,7 @@
     },
     "win": {
       "icon": "build/icon.png",
-      "target": "nsis",
-      "publish": [
-        "github"
-      ]
+      "target": "nsis"
     },
     "linux": {
       "icon": "build/icon.png",
