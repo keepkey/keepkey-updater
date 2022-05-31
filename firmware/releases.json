@@ -11,7 +11,7 @@
       "hash": "6bb7cfd28262fcd61c450fdc3f6932650bdf16a134ab6c1bc6f90b0d1578e620"
     },
     "updater": {
-      "version": "v2.1.2"
+      "version": "v2.1.4"
     }
   },
   "hashes": {
@@ -70,7 +70,7 @@
   "links": {
     "app": "https://app.shapeshift.com",
     "support": "https://shapeshift.zendesk.com",
-    "updater": "https://beta.shapeshift.com/updater-download"
+    "updater": "https://github.com/keepkey/keepkey-updater/releases/latest"
   },
   "strings": {
     "goToApp": "Head over to ShapeShift!",
