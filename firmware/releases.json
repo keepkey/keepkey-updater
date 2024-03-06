@@ -1,9 +1,9 @@
 {
   "latest": {
     "firmware": {
-      "version": "v7.9.1",
-      "url": "v7.9.1/firmware.keepkey.bin",
-      "hash": "fc13cb3a405fdee342ebd0d945403b334f0c43ba19771fdabd0e81caf85a63f7"
+      "version": "v7.9.3",
+      "url": "v7.9.3/firmware.keepkey.bin",
+      "hash": "24cca93ef5e7907dc6d8405b8ab9800d4e072dd9259138cf7679107985b88137"
     },
     "bootloader": {
       "version": "v2.1.4",
@@ -39,6 +39,7 @@
       "fe98454e7ebd4aef4a6db5bd4c60f52cf3f58b974283a7c1e1fcc5fea02cf3eb": "v2.1.4"
     },
     "firmware": {
+      "24cca93ef5e7907dc6d8405b8ab9800d4e072dd9259138cf7679107985b88137": "v7.9.3",
       "fc13cb3a405fdee342ebd0d945403b334f0c43ba19771fdabd0e81caf85a63f7": "v7.9.1",
       "387ec4c8d3dcc83df8707aa0129eeb44e824c3797fb629a493be845327669da1": "v7.9.0",
       "31c1cdd945a7331e01b3cced866cb28add5b49eef87c2bbc08370e5aa7daf9bf": "v7.8.0",
