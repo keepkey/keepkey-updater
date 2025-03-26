@@ -14,6 +14,21 @@
       "version": "v2.1.4"
     }
   },
+  "beta": {
+    "firmware": {
+      "version": "v7.5.0",
+      "url": "v7.5.0/firmware.keepkey.bin",
+      "hash": "b1083a159b6ef4a576574d09c86255d02d634a41f0380ac71ecd1275bf297c09"
+    },
+    "bootloader": {
+      "version": "v2.1.4",
+      "url": "bl_v2.1.4/blupdater.bin",
+      "hash": "6bb7cfd28262fcd61c450fdc3f6932650bdf16a134ab6c1bc6f90b0d1578e620"
+    },
+    "updater": {
+      "version": "v2.1.4"
+    }
+  },
   "hashes": {
     "bootloader": {
       "6397c446f6b9002a8b150bf4b9b4e0bb66800ed099b881ca49700139b0559f10": "v1.0.0",
